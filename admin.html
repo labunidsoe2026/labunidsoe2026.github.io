@@ -3,188 +3,565 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin Galeri Laboratorium Terpadu</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<title>Admin Laboratorium Terpadu</title>
 <style>
-:root{--p:#0b5d4b;--d:#063c31;--bg:#f4f7f6;--mut:#6b7280;--danger:#b42318}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:#1f2937}header{background:linear-gradient(135deg,var(--d),var(--p));color:#fff;padding:22px}.wrap{width:min(1100px,calc(100% - 28px));margin:auto}header .wrap{display:flex;justify-content:space-between;align-items:center;gap:18px}h1{font-size:22px;margin:0}header p{margin:4px 0 0;color:#d7ebe5;font-size:13px}main{padding:32px 0 60px}.card{background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:22px;box-shadow:0 8px 28px rgba(0,0,0,.05);margin-bottom:22px}.login{max-width:470px;margin:60px auto}h2{margin:0 0 18px;color:var(--d)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.full{grid-column:1/-1}.field{display:grid;gap:7px}label{font-size:13px;font-weight:700}input,textarea{width:100%;padding:11px 12px;border:1px solid #d1d5db;border-radius:10px;font:inherit}textarea{min-height:90px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}button{border:0;border-radius:10px;padding:11px 15px;font-weight:700;cursor:pointer}.primary{background:var(--p);color:#fff}.light{background:#fff;color:var(--d)}.secondary{background:#eef2f1}.danger{background:#fee4e2;color:var(--danger)}.hidden{display:none!important}.status{display:none;margin-top:12px;padding:10px 12px;border-radius:10px;font-size:13px}.status.show{display:block}.ok{background:#ecfdf3;color:#027a48}.err{background:#fef3f2;color:#b42318}.toolbar{display:flex;justify-content:space-between;gap:14px;align-items:center}.list{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:18px}.item{background:#fff;border:1px solid #e5e7eb;border-radius:15px;overflow:hidden}.item img{width:100%;height:190px;object-fit:cover;background:#e5e7eb}.body{padding:15px}.body h3{margin:8px 0;color:var(--d)}.badge{display:inline-block;background:#eaf5f2;color:var(--p);border-radius:999px;padding:4px 9px;font-size:11px;font-weight:700}.desc,.small{font-size:13px;color:var(--mut)}.item-actions{display:flex;gap:8px;margin-top:13px}.item-actions button{flex:1}dialog{border:0;border-radius:16px;width:min(540px,calc(100% - 30px));padding:0;box-shadow:0 20px 70px rgba(0,0,0,.25)}dialog::backdrop{background:rgba(0,0,0,.55)}.dialog{padding:22px}.logo-admin-grid{display:grid;grid-template-columns:180px 1fr;gap:24px;align-items:center}
-.logo-preview-box{width:160px;height:160px;border:1px dashed #b8c4c0;border-radius:18px;background:#f7faf9;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.logo-preview-box img{max-width:100%;max-height:100%;object-fit:contain}
-.logo-placeholder{font-weight:800;color:#0b5d4b;font-size:30px}
+:root{--p:#0b5d4b;--d:#063c31;--bg:#f4f7f6;--mut:#667085;--danger:#b42318;--border:#e5e7eb}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:#1f2937}
+header{background:linear-gradient(135deg,var(--d),var(--p));color:#fff;padding:20px 24px}
+.wrap{width:min(1120px,calc(100% - 28px));margin:auto}
+header .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px}
+header h1{font-size:23px;margin:0}
+header p{margin:4px 0 0;color:#d6ebe5;font-size:13px}
+main{padding:32px 0 60px}
+.card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:23px;box-shadow:0 8px 28px rgba(0,0,0,.05);margin-bottom:22px}
+.login{max-width:480px;margin:60px auto}
+h2{margin:0 0 18px;color:var(--d)}
+h3{color:var(--d)}
+.field{display:grid;gap:7px;margin-bottom:14px}
+label{font-weight:700;font-size:13px}
+input,textarea{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:10px;font:inherit}
+textarea{min-height:92px;resize:vertical}
+button{border:0;border-radius:10px;padding:11px 15px;font-weight:700;cursor:pointer}
+button:disabled{opacity:.55;cursor:not-allowed}
+.primary{background:var(--p);color:#fff}
+.secondary{background:#eef2f1;color:#344054}
+.danger{background:#fee4e2;color:var(--danger)}
+.light{background:white;color:var(--d)}
+.hidden{display:none!important}
+.status{display:none;margin-top:12px;padding:11px 12px;border-radius:10px;font-size:13px}
+.status.show{display:block}
+.status.ok{background:#ecfdf3;color:#027a48}
+.status.err{background:#fef3f2;color:#b42318}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.full{grid-column:1/-1}
+.small{font-size:12px;color:var(--mut)}
 
-.admin-menu{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-bottom:22px;
-  background:#fff;
-  border:1px solid #e5e7eb;
-  border-radius:15px;
-  padding:10px;
-  box-shadow:0 6px 22px rgba(0,0,0,.04);
-}
-.admin-menu button{
-  background:transparent;
-  color:#475467;
-  padding:11px 16px;
-}
-.admin-menu button.active{
-  background:var(--p);
-  color:#fff;
-}
-.admin-menu .website-link{
-  margin-left:auto;
-  display:inline-flex;
-  align-items:center;
-  padding:11px 16px;
-  border-radius:10px;
-  background:#eef2f1;
-  color:var(--d);
-  font-weight:700;
-  text-decoration:none;
-}
-.admin-panel.hidden-panel{display:none}
-.profile-intro{
-  padding:14px 16px;
-  border-radius:12px;
-  background:#f0f7f5;
-  color:#475467;
-  margin-bottom:18px;
-  font-size:13px;
-}
+.admin-menu{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff;border:1px solid var(--border);border-radius:15px;padding:10px;margin-bottom:22px}
+.admin-menu button{background:transparent;color:#475467}
+.admin-menu button.active{background:var(--p);color:#fff}
+.website-link{margin-left:auto;display:inline-flex;padding:11px 15px;border-radius:10px;background:#eef2f1;color:var(--d);font-weight:700;text-decoration:none}
+.panel.hidden-panel{display:none}
 
-@media(max-width:820px){.list{grid-template-columns:repeat(2,1fr)}.logo-admin-grid{grid-template-columns:1fr}.logo-preview-box{width:140px;height:140px}}@media(max-width:600px){header .wrap{align-items:flex-start;flex-direction:column}.grid,.list{grid-template-columns:1fr}.full{grid-column:auto}}
+.profile-note{padding:14px 16px;background:#f0f7f5;border-radius:12px;color:#475467;font-size:13px;margin-bottom:20px}
+.logo-grid{display:grid;grid-template-columns:340px 1fr;gap:28px;align-items:center}
+.logo-preview{min-height:170px;padding:20px;border:1px dashed #b8c4c0;border-radius:18px;background:#f8faf9;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.logo-preview img{width:100%;height:130px;object-fit:contain;display:none}
+.logo-fallback{display:inline-flex;align-items:center;justify-content:center;min-width:90px;height:58px;padding:0 18px;border-radius:12px;background:linear-gradient(135deg,var(--p),var(--d));color:#fff;font-size:24px;font-weight:800}
+.logo-tip{margin-top:10px;padding:10px 12px;border-radius:10px;background:#f8faf9;font-size:12px;color:var(--mut)}
+
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:15px}
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:18px}
+.item{border:1px solid var(--border);border-radius:15px;overflow:hidden;background:#fff}
+.item img{width:100%;height:190px;object-fit:cover;background:#e5e7eb}
+.item-body{padding:15px}
+.item h3{margin:8px 0}
+.badge{display:inline-block;padding:4px 9px;border-radius:999px;background:#eaf5f2;color:var(--p);font-size:11px;font-weight:700}
+.desc{font-size:13px;color:var(--mut);min-height:38px}
+.item-actions{display:flex;gap:8px;margin-top:13px}
+.item-actions button{flex:1}
+
+dialog{border:0;border-radius:16px;width:min(540px,calc(100% - 30px));padding:0;box-shadow:0 20px 70px rgba(0,0,0,.25)}
+dialog::backdrop{background:rgba(0,0,0,.55)}
+.dialog-body{padding:22px}
+
+@media(max-width:850px){
+ .gallery{grid-template-columns:repeat(2,1fr)}
+ .logo-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+ header .wrap{flex-direction:column;align-items:flex-start}
+ .grid,.gallery{grid-template-columns:1fr}
+ .full{grid-column:auto}
+ .website-link{margin-left:0}
+}
 </style>
 </head>
 <body>
-<header><div class="wrap"><div><h1>Admin Laboratorium Terpadu</h1><p>Universitas Dr. Soekardjo Banyuwangi</p></div><button id="logout" class="light hidden">Logout</button></div></header>
+<header>
+<div class="wrap">
+  <div>
+    <h1>Admin Laboratorium Terpadu</h1>
+    <p>Universitas Dr. Soekardjo Banyuwangi</p>
+  </div>
+  <button id="logoutBtn" class="light hidden" type="button">Logout</button>
+</div>
+</header>
+
 <main class="wrap">
-<section id="loginBox" class="card login"><h2>Login Admin</h2><div class="field"><label>Email</label><input id="email" type="email"></div><div class="field" style="margin-top:14px"><label>Password</label><input id="password" type="password"></div><div class="actions"><button id="login" class="primary">Login</button></div><div id="loginStatus" class="status"></div></section>
+
+<section id="loginBox" class="card login">
+  <h2>Login Admin</h2>
+  <div class="field">
+    <label>Email</label>
+    <input id="email" type="email" autocomplete="username">
+  </div>
+  <div class="field">
+    <label>Password</label>
+    <input id="password" type="password" autocomplete="current-password">
+  </div>
+  <button id="loginBtn" class="primary" type="button">Login</button>
+  <div id="loginStatus" class="status"></div>
+</section>
+
 <section id="adminBox" class="hidden">
 
-<div class="admin-menu">
-  <button id="menuGaleri" class="active" type="button">🖼️ Galeri</button>
-  <button id="menuProfil" type="button">🏢 Profil Lab & Logo</button>
-  <a class="website-link" href="index.html">← Kembali ke Website</a>
-</div>
-
-<div id="profilPanel" class="admin-panel hidden-panel">
-<div class="card">
-  <h2>Profil Laboratorium</h2>
-  <div class="profile-intro">
-    Kelola identitas visual Laboratorium Terpadu. Logo yang disimpan di sini
-    akan otomatis digunakan pada navbar website utama dan ditampilkan secara penuh
-    tanpa dipotong menjadi bentuk lingkaran.
+  <div class="admin-menu">
+    <button id="menuGallery" class="active" type="button">🖼️ Galeri</button>
+    <button id="menuProfile" type="button">🏢 Profil Lab & Logo</button>
+    <a href="index.html" class="website-link">← Website Utama</a>
   </div>
-  <h3 style="color:var(--d);margin:0 0 16px">Logo Laboratorium</h3>
-  <div class="logo-admin-grid">
-    <div class="logo-preview-box">
-      <span id="logoFallback" class="logo-placeholder">LAB</span>
-      <img id="logoPreview" alt="Preview logo" style="display:none">
-    </div>
-    <div>
-      <div class="field">
-        <label>Pilih Logo Baru</label>
-        <input id="logoFile" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml">
-        <div class="small">Disarankan PNG transparan atau WebP. Maksimal 5 MB.</div>
-        <div class="logo-tip">
-          Rekomendasi: gunakan logo horizontal dengan rasio sekitar 3:1 atau 4:1
-          agar tampil rapi dan proporsional di navbar.
+
+  <div id="profilePanel" class="panel hidden-panel">
+    <div class="card">
+      <h2>Profil Lab & Logo</h2>
+      <div class="profile-note">
+        Logo yang disimpan di sini akan otomatis digunakan pada navbar website utama.
+        Logo ditampilkan secara utuh dan proporsional, bukan dipotong dalam bentuk lingkaran.
+      </div>
+
+      <div class="logo-grid">
+        <div class="logo-preview">
+          <span id="logoFallback" class="logo-fallback">LAB</span>
+          <img id="logoPreview" alt="Logo Laboratorium">
+        </div>
+
+        <div>
+          <div class="field">
+            <label>Pilih Logo Baru</label>
+            <input id="logoFile" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml">
+            <div class="small">PNG transparan/WebP disarankan. Maksimal 5 MB.</div>
+            <div class="logo-tip">
+              Agar estetik di navbar, gunakan logo horizontal dengan rasio kira-kira 3:1 atau 4:1.
+            </div>
+          </div>
+          <div class="actions">
+            <button id="saveLogoBtn" class="primary" type="button">Simpan / Perbarui Logo</button>
+          </div>
+          <div id="logoStatus" class="status"></div>
         </div>
       </div>
-      <div class="actions">
-        <button id="saveLogo" class="primary">Simpan / Perbarui Logo</button>
-      </div>
-      <div id="logoStatus" class="status"></div>
     </div>
   </div>
-</div>
-</div>
 
-<div id="galeriPanel" class="admin-panel">
-<div class="card"><h2>Upload Foto Galeri</h2><div class="grid"><div class="field"><label>Judul</label><input id="judul" placeholder="Contoh: Praktikum RJP"></div><div class="field"><label>Kategori</label><input id="kategori" placeholder="Contoh: Kegiatan Praktikum"></div><div class="field full"><label>Deskripsi</label><textarea id="deskripsi"></textarea></div><div class="field full"><label>Pilih Foto</label><input id="foto" type="file" accept="image/*"><div class="small">Maksimal 10 MB.</div></div></div><div class="actions"><button id="upload" class="primary">Upload & Simpan</button><button id="reset" class="secondary">Kosongkan</button></div><div id="uploadStatus" class="status"></div></div>
-<div class="card"><div class="toolbar"><div><h2 style="margin-bottom:4px">Kelola Galeri</h2><div class="small">Edit judul, kategori, deskripsi, atau hapus.</div></div><button id="refresh" class="secondary">Refresh</button></div><div id="gallery" class="list"></div><div id="empty" class="small">Belum ada data galeri.</div></div>
-</div>
-</section></main>
-<dialog id="editDialog"><div class="dialog"><h2>Edit Galeri</h2><input id="editId" type="hidden"><div class="grid"><div class="field"><label>Judul</label><input id="editJudul"></div><div class="field"><label>Kategori</label><input id="editKategori"></div><div class="field full"><label>Deskripsi</label><textarea id="editDeskripsi"></textarea></div></div><div class="actions"><button id="saveEdit" class="primary">Simpan</button><button id="cancelEdit" class="secondary">Batal</button></div><div id="editStatus" class="status"></div></div></dialog>
+  <div id="galleryPanel" class="panel">
+    <div class="card">
+      <h2>Upload Foto Galeri</h2>
+      <div class="grid">
+        <div class="field"><label>Judul</label><input id="judul"></div>
+        <div class="field"><label>Kategori</label><input id="kategori"></div>
+        <div class="field full"><label>Deskripsi</label><textarea id="deskripsi"></textarea></div>
+        <div class="field full"><label>Pilih Foto</label><input id="foto" type="file" accept="image/*"><div class="small">Maksimal 10 MB.</div></div>
+      </div>
+      <div class="actions">
+        <button id="uploadBtn" class="primary" type="button">Upload & Simpan</button>
+        <button id="resetBtn" class="secondary" type="button">Kosongkan</button>
+      </div>
+      <div id="uploadStatus" class="status"></div>
+    </div>
+
+    <div class="card">
+      <div class="toolbar">
+        <div>
+          <h2 style="margin-bottom:4px">Kelola Galeri</h2>
+          <div class="small">Edit judul, kategori, deskripsi, atau hapus.</div>
+        </div>
+        <button id="refreshBtn" class="secondary" type="button">Refresh</button>
+      </div>
+      <div id="gallery" class="gallery"></div>
+      <div id="empty" class="small">Belum ada data galeri.</div>
+    </div>
+  </div>
+
+</section>
+</main>
+
+<dialog id="editDialog">
+<div class="dialog-body">
+  <h2>Edit Galeri</h2>
+  <input id="editId" type="hidden">
+  <div class="grid">
+    <div class="field"><label>Judul</label><input id="editJudul"></div>
+    <div class="field"><label>Kategori</label><input id="editKategori"></div>
+    <div class="field full"><label>Deskripsi</label><textarea id="editDeskripsi"></textarea></div>
+  </div>
+  <div class="actions">
+    <button id="saveEditBtn" class="primary" type="button">Simpan</button>
+    <button id="cancelEditBtn" class="secondary" type="button">Batal</button>
+  </div>
+  <div id="editStatus" class="status"></div>
+</dialog>
+
 <script>
-const URL='https://plottbyxuuqzlppytkqj.supabase.co';
-const KEY='sb_publishable_rI0z0kyaLhMP3x4_lhL79w_M5oHEGWB';
-const ADMIN='5a12f804-2471-47d5-8605-ae8cd7c99b10';
-const sb=supabase.createClient(URL,KEY),$=id=>document.getElementById(id);
-const LOGO_PATH='branding/logo-lab';
+const BASE_URL = 'https://plottbyxuuqzlppytkqj.supabase.co';
+const API_KEY = 'sb_publishable_rI0z0kyaLhMP3x4_lhL79w_M5oHEGWB';
+const ADMIN_UID = '5a12f804-2471-47d5-8605-ae8cd7c99b10';
+const LOGO_PATH = "branding/logo-lab";
 
-function openAdminPanel(panel){
-  const galeri = $('galeriPanel');
-  const profil = $('profilPanel');
-  const btnGaleri = $('menuGaleri');
-  const btnProfil = $('menuProfil');
+let accessToken = sessionStorage.getItem("lab_access_token") || "";
+let currentUserId = sessionStorage.getItem("lab_user_id") || "";
 
-  if(panel === 'profil'){
-    galeri.classList.add('hidden-panel');
-    profil.classList.remove('hidden-panel');
-    btnGaleri.classList.remove('active');
-    btnProfil.classList.add('active');
-    loadLogoPreview();
-  } else {
-    profil.classList.add('hidden-panel');
-    galeri.classList.remove('hidden-panel');
-    btnProfil.classList.remove('active');
-    btnGaleri.classList.add('active');
-    loadGallery();
+const $ = id => document.getElementById(id);
+
+function setStatus(id, msg, type="") {
+  const el = $(id);
+  el.textContent = msg;
+  el.className = "status show " + type;
+}
+function clearStatus(id) {
+  const el = $(id);
+  el.textContent = "";
+  el.className = "status";
+}
+function showLogin() {
+  $("loginBox").classList.remove("hidden");
+  $("adminBox").classList.add("hidden");
+  $("logoutBtn").classList.add("hidden");
+}
+function showAdmin() {
+  $("loginBox").classList.add("hidden");
+  $("adminBox").classList.remove("hidden");
+  $("logoutBtn").classList.remove("hidden");
+}
+function openPanel(name) {
+  const isProfile = name === "profile";
+  $("profilePanel").classList.toggle("hidden-panel", !isProfile);
+  $("galleryPanel").classList.toggle("hidden-panel", isProfile);
+  $("menuProfile").classList.toggle("active", isProfile);
+  $("menuGallery").classList.toggle("active", !isProfile);
+  if (isProfile) loadLogoPreview();
+  else loadGallery();
+}
+
+async function apiFetch(path, options={}, auth=true) {
+  const headers = Object.assign({"apikey": API_KEY}, options.headers || {});
+  if (auth && accessToken) headers["Authorization"] = "Bearer " + accessToken;
+  return fetch(BASE_URL + path, Object.assign({}, options, {headers}));
+}
+
+async function login() {
+  clearStatus("loginStatus");
+  const email = $("email").value.trim();
+  const password = $("password").value;
+
+  if (!email || !password) {
+    setStatus("loginStatus", "Email dan password wajib diisi.", "err");
+    return;
+  }
+
+  $("loginBtn").disabled = true;
+  $("loginBtn").textContent = "Memproses...";
+
+  try {
+    const res = await fetch(BASE_URL + "/auth/v1/token?grant_type=password", {
+      method: "POST",
+      headers: {
+        "apikey": API_KEY,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({email, password})
+    });
+
+    const raw = await res.text();
+    let data = {};
+    try { data = JSON.parse(raw); } catch (_) {}
+
+    if (!res.ok) {
+      throw new Error(data.error_description || data.msg || data.message || raw || "Login gagal");
+    }
+
+    if (!data.user || data.user.id !== ADMIN_UID) {
+      throw new Error("Akun ini tidak memiliki hak admin.");
+    }
+
+    accessToken = data.access_token;
+    currentUserId = data.user.id;
+    sessionStorage.setItem("lab_access_token", accessToken);
+    sessionStorage.setItem("lab_user_id", currentUserId);
+
+    showAdmin();
+    openPanel("gallery");
+  } catch (err) {
+    setStatus("loginStatus", "Login gagal: " + err.message, "err");
+  } finally {
+    $("loginBtn").disabled = false;
+    $("loginBtn").textContent = "Login";
   }
 }
 
-$('menuGaleri').onclick=()=>openAdminPanel('galeri');
-$('menuProfil').onclick=()=>openAdminPanel('profil');
+$("loginBtn").addEventListener("click", login);
+$("password").addEventListener("keydown", e => { if (e.key === "Enter") login(); });
+$("logoutBtn").addEventListener("click", () => {
+  accessToken = "";
+  currentUserId = "";
+  sessionStorage.removeItem("lab_access_token");
+  sessionStorage.removeItem("lab_user_id");
+  showLogin();
+});
+$("menuGallery").addEventListener("click", () => openPanel("gallery"));
+$("menuProfile").addEventListener("click", () => openPanel("profile"));
 
-function loadLogoPreview(){
-  const {data}=sb.storage.from('galery').getPublicUrl(LOGO_PATH);
-  const img=$('logoPreview');
-  if(!img)return;
-  img.onload=()=>{img.style.display='block';$('logoFallback').style.display='none'};
-  img.onerror=()=>{img.style.display='none';$('logoFallback').style.display='block'};
-  img.src=data.publicUrl+'?v='+Date.now();
+function loadLogoPreview() {
+  const img = $("logoPreview");
+  const fallback = $("logoFallback");
+  img.onload = () => {
+    img.style.display = "block";
+    fallback.style.display = "none";
+  };
+  img.onerror = () => {
+    img.style.display = "none";
+    fallback.style.display = "inline-flex";
+  };
+  img.src = BASE_URL + "/storage/v1/object/public/galery/" + LOGO_PATH + "?v=" + Date.now();
 }
 
-$('saveLogo').onclick=async()=>{
-  clear($('logoStatus'));
-  const file=$('logoFile').files[0];
-  if(!file)return status($('logoStatus'),'Silakan pilih file logo terlebih dahulu.','err');
-  if(file.size>5*1024*1024)return status($('logoStatus'),'Ukuran logo maksimal 5 MB.','err');
+$("saveLogoBtn").addEventListener("click", async () => {
+  clearStatus("logoStatus");
+  const file = $("logoFile").files[0];
 
-  $('saveLogo').disabled=true;
-  $('saveLogo').textContent='Menyimpan...';
+  if (!file) {
+    setStatus("logoStatus", "Silakan pilih file logo.", "err");
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    setStatus("logoStatus", "Ukuran logo maksimal 5 MB.", "err");
+    return;
+  }
 
-  // Hapus logo lama jika ada. Error file tidak ada dapat diabaikan.
-  await sb.storage.from('galery').remove([LOGO_PATH]);
+  $("saveLogoBtn").disabled = true;
+  $("saveLogoBtn").textContent = "Menyimpan...";
 
-  const {error}=await sb.storage.from('galery').upload(
-    LOGO_PATH,
-    file,
-    {cacheControl:'60',upsert:false,contentType:file.type}
-  );
+  try {
+    // Hapus logo lama. Jika belum ada, error diabaikan.
+    await apiFetch("/storage/v1/object/galery/" + LOGO_PATH, {method:"DELETE"});
 
-  $('saveLogo').disabled=false;
-  $('saveLogo').textContent='Simpan / Perbarui Logo';
+    const up = await apiFetch("/storage/v1/object/galery/" + LOGO_PATH, {
+      method: "POST",
+      headers: {
+        "Content-Type": file.type || "application/octet-stream",
+        "x-upsert": "false"
+      },
+      body: file
+    });
 
-  if(error)return status($('logoStatus'),'Logo gagal disimpan: '+error.message,'err');
+    if (!up.ok) throw new Error(await up.text());
 
-  $('logoFile').value='';
-  loadLogoPreview();
-  status($('logoStatus'),'Logo berhasil diperbarui. Refresh website utama untuk melihat hasilnya.','ok');
-};
-function status(el,msg,type=''){el.textContent=msg;el.className='status show '+type}function clear(el){el.textContent='';el.className='status'}
-function showLogin(){ $('loginBox').classList.remove('hidden');$('adminBox').classList.add('hidden');$('logout').classList.add('hidden') }function showAdmin(){ $('loginBox').classList.add('hidden');$('adminBox').classList.remove('hidden');$('logout').classList.remove('hidden') }
-async function boot(){const {data}=await sb.auth.getSession();if(!data.session)return showLogin();if(data.session.user.id!==ADMIN){await sb.auth.signOut();return showLogin()}showAdmin();openAdminPanel('galeri')}
-$('login').onclick=async()=>{clear($('loginStatus'));const email=$('email').value.trim(),password=$('password').value;if(!email||!password)return status($('loginStatus'),'Email dan password wajib diisi.','err');const {data,error}=await sb.auth.signInWithPassword({email,password});if(error)return status($('loginStatus'),'Login gagal: '+error.message,'err');if(!data.user||data.user.id!==ADMIN){await sb.auth.signOut();return status($('loginStatus'),'Akun ini bukan admin yang diizinkan.','err')}showAdmin();openAdminPanel('galeri')};
-$('logout').onclick=async()=>{await sb.auth.signOut();showLogin()};$('reset').onclick=()=>{$('judul').value='';$('kategori').value='';$('deskripsi').value='';$('foto').value='';clear($('uploadStatus'))};
-function safeName(name){const ext=name.includes('.')?'.'+name.split('.').pop().toLowerCase():'';const base=name.replace(/\.[^/.]+$/,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,45)||'foto';return Date.now()+'-'+base+ext}
-$('upload').onclick=async()=>{clear($('uploadStatus'));const judul=$('judul').value.trim(),kategori=$('kategori').value.trim(),deskripsi=$('deskripsi').value.trim(),file=$('foto').files[0];if(!judul||!file)return status($('uploadStatus'),'Judul dan foto wajib diisi.','err');if(file.size>10*1024*1024)return status($('uploadStatus'),'Ukuran foto melebihi 10 MB.','err');const nama=safeName(file.name);$('upload').disabled=true;$('upload').textContent='Mengupload...';const {error:upErr}=await sb.storage.from('galery').upload(nama,file,{cacheControl:'3600',upsert:false,contentType:file.type});if(upErr){$('upload').disabled=false;$('upload').textContent='Upload & Simpan';return status($('uploadStatus'),'Upload gagal: '+upErr.message,'err')}const {data:pub}=sb.storage.from('galery').getPublicUrl(nama);const {error:dbErr}=await sb.from('galery').insert({judul,deskripsi,kategori,url_foto:pub.publicUrl,nama_file:nama});if(dbErr){await sb.storage.from('galery').remove([nama]);$('upload').disabled=false;$('upload').textContent='Upload & Simpan';return status($('uploadStatus'),'Data gagal disimpan: '+dbErr.message,'err')}$('upload').disabled=false;$('upload').textContent='Upload & Simpan';$('judul').value='';$('kategori').value='';$('deskripsi').value='';$('foto').value='';status($('uploadStatus'),'Foto berhasil diupload.','ok');loadGallery()};
-function esc(v){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;')}
-async function loadGallery(){$('gallery').innerHTML='';const {data,error}=await sb.from('galery').select('*').order('created_at',{ascending:false});if(error){$('empty').textContent='Gagal membaca galeri: '+error.message;$('empty').classList.remove('hidden');return}if(!data||!data.length){$('empty').textContent='Belum ada data galeri.';$('empty').classList.remove('hidden');return}$('empty').classList.add('hidden');data.forEach(item=>{const el=document.createElement('article');el.className='item';el.innerHTML=`<img src="${esc(item.url_foto||'')}" alt="${esc(item.judul||'Foto')}"><div class="body">${item.kategori?`<span class="badge">${esc(item.kategori)}</span>`:''}<h3>${esc(item.judul||'Tanpa judul')}</h3><div class="desc">${esc(item.deskripsi||'')}</div><div class="item-actions"><button class="secondary edit">Edit</button><button class="danger del">Hapus</button></div></div>`;el.querySelector('.edit').onclick=()=>openEdit(item);el.querySelector('.del').onclick=()=>removeItem(item);$('gallery').appendChild(el)})}
-function openEdit(item){$('editId').value=item.id;$('editJudul').value=item.judul||'';$('editKategori').value=item.kategori||'';$('editDeskripsi').value=item.deskripsi||'';clear($('editStatus'));$('editDialog').showModal()}
-$('cancelEdit').onclick=()=>$('editDialog').close();$('saveEdit').onclick=async()=>{const id=$('editId').value,judul=$('editJudul').value.trim(),kategori=$('editKategori').value.trim(),deskripsi=$('editDeskripsi').value.trim();if(!judul)return status($('editStatus'),'Judul tidak boleh kosong.','err');const {error}=await sb.from('galery').update({judul,kategori,deskripsi}).eq('id',id);if(error)return status($('editStatus'),'Gagal menyimpan: '+error.message,'err');status($('editStatus'),'Perubahan berhasil disimpan.','ok');loadGallery();setTimeout(()=>$('editDialog').close(),500)};
-async function removeItem(item){if(!confirm('Hapus "'+(item.judul||'foto ini')+'"?'))return;if(item.nama_file){const {error}=await sb.storage.from('galery').remove([item.nama_file]);if(error)return alert('File gagal dihapus: '+error.message)}const {error}=await sb.from('galery').delete().eq('id',item.id);if(error)return alert('Data gagal dihapus: '+error.message);loadGallery()}
-$('refresh').onclick=loadGallery;sb.auth.onAuthStateChange((_e,s)=>{if(!s)showLogin()});boot();
+    $("logoFile").value = "";
+    loadLogoPreview();
+    setStatus("logoStatus", "Logo berhasil diperbarui. Refresh website utama untuk melihat hasilnya.", "ok");
+  } catch (err) {
+    setStatus("logoStatus", "Logo gagal disimpan: " + err.message, "err");
+  } finally {
+    $("saveLogoBtn").disabled = false;
+    $("saveLogoBtn").textContent = "Simpan / Perbarui Logo";
+  }
+});
+
+function safeName(name) {
+  const parts = name.split(".");
+  const ext = parts.length > 1 ? "." + parts.pop().toLowerCase() : "";
+  const base = parts.join(".").toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 45) || "foto";
+  return Date.now() + "-" + base + ext;
+}
+
+$("resetBtn").addEventListener("click", () => {
+  $("judul").value = "";
+  $("kategori").value = "";
+  $("deskripsi").value = "";
+  $("foto").value = "";
+  clearStatus("uploadStatus");
+});
+
+$("uploadBtn").addEventListener("click", async () => {
+  clearStatus("uploadStatus");
+  const judul = $("judul").value.trim();
+  const kategori = $("kategori").value.trim();
+  const deskripsi = $("deskripsi").value.trim();
+  const file = $("foto").files[0];
+
+  if (!judul || !file) {
+    setStatus("uploadStatus", "Judul dan foto wajib diisi.", "err");
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    setStatus("uploadStatus", "Ukuran foto melebihi 10 MB.", "err");
+    return;
+  }
+
+  $("uploadBtn").disabled = true;
+  $("uploadBtn").textContent = "Mengupload...";
+
+  const fileName = safeName(file.name);
+
+  try {
+    const up = await apiFetch("/storage/v1/object/galery/" + encodeURIComponent(fileName), {
+      method: "POST",
+      headers: {
+        "Content-Type": file.type || "application/octet-stream",
+        "x-upsert": "false"
+      },
+      body: file
+    });
+    if (!up.ok) throw new Error("Upload gagal: " + await up.text());
+
+    const publicUrl = BASE_URL + "/storage/v1/object/public/galery/" + encodeURIComponent(fileName);
+
+    const db = await apiFetch("/rest/v1/galery", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify({
+        judul, kategori, deskripsi,
+        url_foto: publicUrl,
+        nama_file: fileName
+      })
+    });
+    if (!db.ok) {
+      await apiFetch("/storage/v1/object/galery/" + encodeURIComponent(fileName), {method:"DELETE"});
+      throw new Error("Data gagal disimpan: " + await db.text());
+    }
+
+    $("judul").value = "";
+    $("kategori").value = "";
+    $("deskripsi").value = "";
+    $("foto").value = "";
+    setStatus("uploadStatus", "Foto berhasil diupload.", "ok");
+    await loadGallery();
+  } catch (err) {
+    setStatus("uploadStatus", err.message, "err");
+  } finally {
+    $("uploadBtn").disabled = false;
+    $("uploadBtn").textContent = "Upload & Simpan";
+  }
+});
+
+function esc(v) {
+  return String(v ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+async function loadGallery() {
+  $("gallery").innerHTML = "";
+  $("empty").textContent = "Memuat data...";
+  $("empty").classList.remove("hidden");
+
+  try {
+    const res = await apiFetch("/rest/v1/galery?select=*&order=created_at.desc", {method:"GET"});
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+
+    if (!data.length) {
+      $("empty").textContent = "Belum ada data galeri.";
+      return;
+    }
+
+    $("empty").classList.add("hidden");
+
+    data.forEach(item => {
+      const card = document.createElement("article");
+      card.className = "item";
+      card.innerHTML = `
+        <img src="${esc(item.url_foto || "")}" alt="${esc(item.judul || "Foto")}">
+        <div class="item-body">
+          ${item.kategori ? `<span class="badge">${esc(item.kategori)}</span>` : ""}
+          <h3>${esc(item.judul || "Tanpa judul")}</h3>
+          <div class="desc">${esc(item.deskripsi || "")}</div>
+          <div class="item-actions">
+            <button type="button" class="secondary edit">Edit</button>
+            <button type="button" class="danger del">Hapus</button>
+          </div>
+        </div>
+      `;
+      card.querySelector(".edit").addEventListener("click", () => openEdit(item));
+      card.querySelector(".del").addEventListener("click", () => deleteItem(item));
+      $("gallery").appendChild(card);
+    });
+  } catch (err) {
+    $("empty").textContent = "Gagal membaca galeri: " + err.message;
+  }
+}
+
+$("refreshBtn").addEventListener("click", loadGallery);
+
+function openEdit(item) {
+  $("editId").value = item.id;
+  $("editJudul").value = item.judul || "";
+  $("editKategori").value = item.kategori || "";
+  $("editDeskripsi").value = item.deskripsi || "";
+  clearStatus("editStatus");
+  $("editDialog").showModal();
+}
+
+$("cancelEditBtn").addEventListener("click", () => $("editDialog").close());
+
+$("saveEditBtn").addEventListener("click", async () => {
+  clearStatus("editStatus");
+  const id = $("editId").value;
+  const judul = $("editJudul").value.trim();
+  const kategori = $("editKategori").value.trim();
+  const deskripsi = $("editDeskripsi").value.trim();
+
+  if (!judul) {
+    setStatus("editStatus", "Judul tidak boleh kosong.", "err");
+    return;
+  }
+
+  try {
+    const res = await apiFetch("/rest/v1/galery?id=eq." + encodeURIComponent(id), {
+      method: "PATCH",
+      headers: {
+        "Content-Type":"application/json",
+        "Prefer":"return=minimal"
+      },
+      body: JSON.stringify({judul,kategori,deskripsi})
+    });
+    if (!res.ok) throw new Error(await res.text());
+
+    setStatus("editStatus", "Perubahan berhasil disimpan.", "ok");
+    await loadGallery();
+    setTimeout(() => $("editDialog").close(), 500);
+  } catch (err) {
+    setStatus("editStatus", "Gagal menyimpan: " + err.message, "err");
+  }
+});
+
+async function deleteItem(item) {
+  if (!confirm('Hapus "' + (item.judul || "foto ini") + '"?')) return;
+
+  try {
+    if (item.nama_file) {
+      const s = await apiFetch("/storage/v1/object/galery/" + encodeURIComponent(item.nama_file), {method:"DELETE"});
+      if (!s.ok) throw new Error("File gagal dihapus: " + await s.text());
+    }
+
+    const d = await apiFetch("/rest/v1/galery?id=eq." + encodeURIComponent(item.id), {
+      method:"DELETE",
+      headers:{"Prefer":"return=minimal"}
+    });
+    if (!d.ok) throw new Error("Data gagal dihapus: " + await d.text());
+
+    await loadGallery();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+if (accessToken && currentUserId === ADMIN_UID) {
+  showAdmin();
+  openPanel("gallery");
+} else {
+  showLogin();
+}
 </script>
-</body></html>
+</body>
+</html>
