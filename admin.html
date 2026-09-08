@@ -825,7 +825,7 @@ async function saveSitePhoto(slot){
         method:"POST",
         headers:{
           "Content-Type":file.type || "application/octet-stream",
-          "x-upsert":"false"
+          "x-upsert":"true"
         },
         body:file
       }
@@ -873,7 +873,7 @@ $("saveLogoBtn").addEventListener("click",async()=>{
     await apiFetch("/storage/v1/object/galery/"+LOGO_PATH,{method:"DELETE"});
     const up=await apiFetch("/storage/v1/object/galery/"+LOGO_PATH,{
       method:"POST",
-      headers:{"Content-Type":file.type||"application/octet-stream","x-upsert":"false"},
+      headers:{"Content-Type":file.type||"application/octet-stream","x-upsert":"true"},
       body:file
     });
     if(!up.ok) throw new Error(await up.text());
