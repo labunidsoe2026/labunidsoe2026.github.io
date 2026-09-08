@@ -63,7 +63,7 @@
 
 <div class="admin-menu">
   <button id="menuGaleri" class="active" type="button">🖼️ Galeri</button>
-  <button id="menuProfil" type="button">🏢 Profil Lab</button>
+  <button id="menuProfil" type="button">🏢 Profil Lab & Logo</button>
   <a class="website-link" href="index.html">← Kembali ke Website</a>
 </div>
 
@@ -72,7 +72,8 @@
   <h2>Profil Laboratorium</h2>
   <div class="profile-intro">
     Kelola identitas visual Laboratorium Terpadu. Logo yang disimpan di sini
-    akan otomatis digunakan pada navbar website utama.
+    akan otomatis digunakan pada navbar website utama dan ditampilkan secara penuh
+    tanpa dipotong menjadi bentuk lingkaran.
   </div>
   <h3 style="color:var(--d);margin:0 0 16px">Logo Laboratorium</h3>
   <div class="logo-admin-grid">
@@ -85,6 +86,10 @@
         <label>Pilih Logo Baru</label>
         <input id="logoFile" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml">
         <div class="small">Disarankan PNG transparan atau WebP. Maksimal 5 MB.</div>
+        <div class="logo-tip">
+          Rekomendasi: gunakan logo horizontal dengan rasio sekitar 3:1 atau 4:1
+          agar tampil rapi dan proporsional di navbar.
+        </div>
       </div>
       <div class="actions">
         <button id="saveLogo" class="primary">Simpan / Perbarui Logo</button>
