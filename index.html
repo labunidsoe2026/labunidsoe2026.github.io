@@ -51,8 +51,8 @@
         }
 
         .brand-logo {
-            width: 48px;
-            height: 48px;
+            width: 52px;
+            height: 52px;
             background: #0b6b50;
             color: white;
             border-radius: 50%;
@@ -60,6 +60,40 @@
             justify-content: center;
             align-items: center;
             font-weight: bold;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .brand-logo img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: white;
+            padding: 2px;
+            z-index: 2;
+        }
+
+        .brand-logo span {
+            position: relative;
+            z-index: 1;
+        }
+
+        nav a.admin-nav {
+            background: #065f46;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-left: 28px;
+            box-shadow: 0 5px 14px rgba(6,95,70,.18);
+            white-space: nowrap;
+        }
+
+        nav a.admin-nav:hover {
+            background: #064e3b;
+            color: white;
         }
 
         .brand h3 {
@@ -69,6 +103,11 @@
 
         .brand small {
             color: #6b7280;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
         }
 
         nav a {
@@ -509,7 +548,11 @@
         <div class="brand">
 
             <div class="brand-logo">
-                LAB
+                <span>LAB</span>
+                <img id="labLogo" alt="Logo Laboratorium Terpadu"
+                     style="display:none"
+                     onload="this.style.display='block'"
+                     onerror="this.style.display='none'">
             </div>
 
             <div>
@@ -525,6 +568,7 @@
             <a href="#laboratorium">Laboratorium</a>
             <a href="#galeri">Galeri</a>
             <a href="#kontak">Kontak</a>
+            <a href="admin.html" class="admin-nav">🔐 Login Admin</a>
         </nav>
 
     </div>
@@ -988,6 +1032,14 @@
 <script>
 const SUPABASE_URL = "https://plottbyxuuqzlppytkqj.supabase.co";
 const SUPABASE_KEY = "sb_publishable_rI0z0kyaLhMP3x4_lhL79w_M5oHEGWB";
+
+const labLogo = document.getElementById("labLogo");
+if (labLogo) {
+    labLogo.src =
+        SUPABASE_URL +
+        "/storage/v1/object/public/galery/branding/logo-lab?v=" +
+        Date.now();
+}
 
 const galleryGrid = document.getElementById("galleryGrid");
 const galleryStatus = document.getElementById("galleryStatus");
