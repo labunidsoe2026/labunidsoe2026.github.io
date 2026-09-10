@@ -172,6 +172,7 @@ dialog::backdrop{background:rgba(0,0,0,.55)} .dialog-body{padding:22px}
     <button id="menuManage" type="button">🖼️ Kelola Foto</button>
     <button id="menuGroup" type="button">🗂️ Kelompok / Album</button>
     <button id="menuSitePhotos" type="button">🖼️ Foto Tampilan Website</button>
+    <button id="menuContent" type="button">📝 Konten Website</button>
     <button id="menuProfile" type="button">🏢 Profil Lab & Logo</button>
     <a href="index.html" class="website-link">← Website Utama</a>
   </div>
@@ -378,6 +379,48 @@ dialog::backdrop{background:rgba(0,0,0,.55)} .dialog-body{padding:22px}
     </div>
   </div>
 
+
+  
+<div class="card" id="dynamicFacilityManager">
+<h2>Fasilitas Website Dinamis</h2>
+<div class="profile-note">
+Tambah, ubah, dan hapus fasilitas melalui database website_content.
+</div>
+
+<button id="addDynamicFacilityBtn" class="primary" type="button">
++ Tambahkan Fasilitas
+</button>
+
+<div id="dynamicFacilityList" class="gallery"></div>
+</div>
+
+<div id="contentPanel" class="panel hidden-panel">
+    <div class="card">
+      <h2>📝 Konten Website</h2>
+      <div class="profile-note">Kelola judul dan deskripsi konten website tanpa mengubah kode.</div>
+      <div class="grid">
+        <div class="field">
+          <label>Bagian</label>
+          <select id="contentBagian">
+            <option value="fasilitas">Fasilitas</option>
+            <option value="hero">Hero</option>
+            <option value="profil">Profil</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Tipe</label>
+          <input id="contentTipe" value="card">
+        </div>
+        <div class="field full"><label>Judul</label><input id="contentJudul"></div>
+        <div class="field full"><label>Deskripsi</label><textarea id="contentDeskripsi"></textarea></div>
+      </div>
+      <div class="actions"><button id="saveContentBtn" class="primary" type="button">Simpan Konten</button></div>
+      <div id="contentStatus" class="status"></div>
+      <hr>
+      <div id="contentList"></div>
+    </div>
+  </div>
+
   <div id="profilePanel" class="panel hidden-panel">
     <div class="card">
       <h2>Profil Lab & Logo</h2>
@@ -451,7 +494,7 @@ function showAdmin(){
   $("logoutBtn").classList.remove("hidden");
 }
 function openPanel(name){
-  const map={add:"addPanel",manage:"managePanel",group:"groupPanel",sitePhotos:"sitePhotosPanel",profile:"profilePanel"};
+  const map={add:"addPanel",manage:"managePanel",group:"groupPanel",sitePhotos:"sitePhotosPanel",content:"contentPanel",profile:"profilePanel"};
   Object.values(map).forEach(id => $(id).classList.add("hidden-panel"));
   Object.keys(map).forEach(key => $("menu"+key.charAt(0).toUpperCase()+key.slice(1))?.classList.remove("active"));
   $(map[name]).classList.remove("hidden-panel");
@@ -460,11 +503,13 @@ function openPanel(name){
   if(name==="manage") $("menuManage").classList.add("active");
   if(name==="group") $("menuGroup").classList.add("active");
   if(name==="sitePhotos") $("menuSitePhotos").classList.add("active");
+  if(name==="content") $("menuContent").classList.add("active");
   if(name==="profile") $("menuProfile").classList.add("active");
 
   if(name==="manage") renderManage();
   if(name==="group") renderGroups();
   if(name==="sitePhotos") loadSitePhotoPreviews();
+  if(name==="content") loadContent();
   if(name==="profile") loadLogoPreview();
 }
 
@@ -473,6 +518,41 @@ async function apiFetch(path,options={},auth=true){
   if(auth && accessToken) headers["Authorization"]="Bearer "+accessToken;
   return fetch(BASE_URL+path,Object.assign({},options,{headers}));
 }
+
+
+
+async function loadContent(){
+  const res=await apiFetch('/rest/v1/website_content?select=*&order=id.asc');
+  const data=await res.json();
+  $("contentList").innerHTML=data.map(x=>`
+    <div class="card" style="margin-top:10px">
+      <b>${x.judul||''}</b><br>
+      <small>${x.bagian||''} - ${x.tipe||''}</small>
+      <p>${x.deskripsi||''}</p>
+    </div>`).join('');
+}
+
+async function saveContent(){
+  const body={
+    bagian:$("contentBagian").value,
+    tipe:$("contentTipe").value,
+    judul:$("contentJudul").value,
+    deskripsi:$("contentDeskripsi").value
+  };
+  const res=await apiFetch('/rest/v1/website_content',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Prefer':'return=minimal'},
+    body:JSON.stringify(body)
+  });
+  if(res.ok){
+    setStatus('contentStatus','Konten berhasil disimpan.','ok');
+    loadContent();
+  }else{
+    setStatus('contentStatus','Gagal: '+await res.text(),'err');
+  }
+}
+
+$("saveContentBtn")?.addEventListener('click',saveContent);
 
 async function login(){
   clearStatus("loginStatus");
@@ -517,6 +597,7 @@ $("menuAdd").addEventListener("click",()=>openPanel("add"));
 $("menuManage").addEventListener("click",()=>openPanel("manage"));
 $("menuGroup").addEventListener("click",()=>openPanel("group"));
 $("menuSitePhotos").addEventListener("click",()=>openPanel("sitePhotos"));
+$("menuContent").addEventListener("click",()=>openPanel("content"));
 $("menuProfile").addEventListener("click",()=>openPanel("profile"));
 
 function categories(){
@@ -825,7 +906,7 @@ async function saveSitePhoto(slot){
         method:"POST",
         headers:{
           "Content-Type":file.type || "application/octet-stream",
-          "x-upsert":"false"
+          "x-upsert":"true"
         },
         body:file
       }
@@ -873,7 +954,7 @@ $("saveLogoBtn").addEventListener("click",async()=>{
     await apiFetch("/storage/v1/object/galery/"+LOGO_PATH,{method:"DELETE"});
     const up=await apiFetch("/storage/v1/object/galery/"+LOGO_PATH,{
       method:"POST",
-      headers:{"Content-Type":file.type||"application/octet-stream","x-upsert":"false"},
+      headers:{"Content-Type":file.type||"application/octet-stream","x-upsert":"true"},
       body:file
     });
     if(!up.ok) throw new Error(await up.text());
@@ -890,12 +971,43 @@ if(accessToken && currentUserId===ADMIN_UID){
 </script>
 
 
-<!--
-VERSI FINAL FOTO TAMPILAN DINAMIS
-- Basis: admin stabil sebelumnya
-- Modul fasilitas dinamis disiapkan untuk website_content
-- Fitur lama (login, galeri, logo) dipertahankan
--->
+<script>
+// Modul fasilitas dinamis website_content
+async function loadDynamicFacilities(){
+  const res = await apiFetch('/rest/v1/website_content?bagian=eq.fasilitas&select=*');
+  const data = await res.json();
+  const box = document.getElementById('dynamicFacilityList');
+  if(!box) return;
+  box.innerHTML = data.map(x=>`
+    <div class="item">
+      <div class="item-body">
+        <h3>${x.judul || ''}</h3>
+        <p>${x.deskripsi || ''}</p>
+        <button class="secondary" onclick="editDynamicFacility(${x.id})">Edit</button>
+        <button class="danger" onclick="deleteDynamicFacility(${x.id})">Hapus</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function deleteDynamicFacility(id){
+  if(!confirm('Hapus fasilitas ini?')) return;
+  await apiFetch('/rest/v1/website_content?id=eq.'+id,{
+    method:'DELETE'
+  });
+  loadDynamicFacilities();
+}
+
+function editDynamicFacility(id){
+  alert('Edit fasilitas ID '+id+' akan menggunakan form dinamis.');
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  if(document.getElementById('dynamicFacilityList')){
+    loadDynamicFacilities();
+  }
+});
+</script>
 
 </body>
 </html>
