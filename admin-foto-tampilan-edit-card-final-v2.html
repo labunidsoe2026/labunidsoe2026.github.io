@@ -8,16 +8,6 @@
 <style>
 :root{--p:#0b5d4b;--d:#063c31;--bg:#f4f7f6;--mut:#6b7280;--danger:#b42318}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:#1f2937}header{background:linear-gradient(135deg,var(--d),var(--p));color:#fff;padding:22px}.wrap{width:min(1100px,calc(100% - 28px));margin:auto}header .wrap{display:flex;justify-content:space-between;align-items:center;gap:18px}h1{font-size:22px;margin:0}header p{margin:4px 0 0;color:#d7ebe5;font-size:13px}main{padding:32px 0 60px}.card{background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:22px;box-shadow:0 8px 28px rgba(0,0,0,.05);margin-bottom:22px}.login{max-width:470px;margin:60px auto}h2{margin:0 0 18px;color:var(--d)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.full{grid-column:1/-1}.field{display:grid;gap:7px}label{font-size:13px;font-weight:700}input,textarea{width:100%;padding:11px 12px;border:1px solid #d1d5db;border-radius:10px;font:inherit}textarea{min-height:90px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}button{border:0;border-radius:10px;padding:11px 15px;font-weight:700;cursor:pointer}.primary{background:var(--p);color:#fff}.light{background:#fff;color:var(--d)}.secondary{background:#eef2f1}.danger{background:#fee4e2;color:var(--danger)}.hidden{display:none!important}.status{display:none;margin-top:12px;padding:10px 12px;border-radius:10px;font-size:13px}.status.show{display:block}.ok{background:#ecfdf3;color:#027a48}.err{background:#fef3f2;color:#b42318}.toolbar{display:flex;justify-content:space-between;gap:14px;align-items:center}.list{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:18px}.item{background:#fff;border:1px solid #e5e7eb;border-radius:15px;overflow:hidden}.item img{width:100%;height:190px;object-fit:cover;background:#e5e7eb}.body{padding:15px}.body h3{margin:8px 0;color:var(--d)}.badge{display:inline-block;background:#eaf5f2;color:var(--p);border-radius:999px;padding:4px 9px;font-size:11px;font-weight:700}.desc,.small{font-size:13px;color:var(--mut)}.item-actions{display:flex;gap:8px;margin-top:13px}.item-actions button{flex:1}dialog{border:0;border-radius:16px;width:min(540px,calc(100% - 30px));padding:0;box-shadow:0 20px 70px rgba(0,0,0,.25)}dialog::backdrop{background:rgba(0,0,0,.55)}.dialog{padding:22px}@media(max-width:820px){.list{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){header .wrap{align-items:flex-start;flex-direction:column}.grid,.list{grid-template-columns:1fr}.full{grid-column:auto}}
 </style>
-
-<!--
-REVISI CARD FOTO:
-- Edit judul foto
-- Edit keterangan foto
-- Ganti foto
-- Simpan perubahan
-Target: kartu Foto Hero/Profil/Fasilitas yang sudah ada
--->
-
 </head>
 <body>
 <header><div class="wrap"><div><h1>Admin Laboratorium Terpadu</h1><p>Universitas Dr. Soekardjo Banyuwangi</p></div><button id="logout" class="light hidden">Logout</button></div></header>
@@ -48,54 +38,41 @@ async function removeItem(item){if(!confirm('Hapus "'+(item.judul||'foto ini')+'
 $('refresh').onclick=loadGallery;sb.auth.onAuthStateChange((_e,s)=>{if(!s)showLogin()});boot();
 </script>
 
-<!-- EDIT CARD FOTO WEBSITE -->
+<!-- MODUL EDIT CARD FOTO WEBSITE - TIDAK MENGUBAH LOGIN -->
 <style>
 .edit-card-foto{
-margin-top:15px;padding:12px;border:1px solid #ddd;border-radius:10px;background:#fafafa
+margin-top:12px;padding:12px;border:1px solid #e5e7eb;border-radius:10px;background:#fafafa
 }
-.edit-card-foto input,.edit-card-foto textarea{
-width:100%;margin-top:6px;padding:8px;border-radius:6px;border:1px solid #ccc
-}
+.edit-card-foto label{display:block;margin-top:8px;font-size:13px;font-weight:700}
+.edit-card-foto input,.edit-card-foto textarea{width:100%;margin-top:5px;padding:8px}
 </style>
 
 <script>
-document.addEventListener("DOMContentLoaded",function(){
-
-const cards=document.querySelectorAll(".card");
-
-cards.forEach(function(card){
-
- const title=card.querySelector("h2,h3");
- if(!title) return;
-
- const text=card.innerText.toLowerCase();
-
- if(text.includes("foto") && !card.querySelector(".edit-card-foto")){
-
+/*
+ Modul ini hanya menambahkan area edit pada kartu foto yang sudah ada.
+ Login dan koneksi utama tetap memakai admin asli.
+*/
+document.addEventListener("DOMContentLoaded",()=>{
+ const cards=document.querySelectorAll(".site-photo-card");
+ cards.forEach(card=>{
+   if(card.querySelector(".edit-card-foto")) return;
    const box=document.createElement("div");
    box.className="edit-card-foto";
-
    box.innerHTML=`
-   <label>Judul Foto</label>
-   <input class="editJudul" value="${title.innerText}">
+    <label>Judul Foto</label>
+    <input class="edit-foto-judul" placeholder="Masukkan judul foto">
 
-   <label>Keterangan Foto</label>
-   <textarea class="editKet">${card.querySelector("p")?.innerText || ""}</textarea>
+    <label>Keterangan Foto</label>
+    <textarea class="edit-foto-keterangan" placeholder="Masukkan keterangan foto"></textarea>
 
-   <button type="button" class="btnEditFoto">
-   Simpan Perubahan
-   </button>
+    <button type="button" class="secondary edit-simpan-info">Simpan Perubahan</button>
    `;
-
    card.appendChild(box);
 
-   box.querySelector(".btnEditFoto").onclick=function(){
-      alert("Tampilan edit aktif. Tahap berikutnya menghubungkan simpan ke tabel galery Supabase.");
-   };
- }
-
-});
-
+   box.querySelector(".edit-simpan-info").addEventListener("click",()=>{
+      alert("Form edit siap. Tahap berikutnya menghubungkan penyimpanan ke tabel galery.");
+   });
+ });
 });
 </script>
 
