@@ -409,13 +409,24 @@ dialog::backdrop{background:rgba(0,0,0,.55)} .dialog-body{padding:22px}
 <div class="card" id="dynamicFacilityManager">
 <h2>Fasilitas Website Dinamis</h2>
 <div class="profile-note">
-Tambah, ubah, dan hapus fasilitas melalui database website_content.
+Tambahkan fasilitas serta ubah judul dan deskripsinya melalui formulir di bawah.
 </div>
 
 <button id="addDynamicFacilityBtn" class="primary" type="button">
 + Tambahkan Fasilitas
 </button>
 
+<button id="refreshDynamicFacilityBtn" class="secondary" type="button">Muat Ulang</button>
+<form id="dynamicFacilityForm" class="hidden" style="margin-top:18px">
+  <h3 id="dynamicFormTitle">Tambah Fasilitas</h3>
+  <div class="field"><label for="dynamicJudul">Judul Fasilitas</label><input id="dynamicJudul" required></div>
+  <div class="field"><label for="dynamicDeskripsi">Deskripsi / Keterangan</label><textarea id="dynamicDeskripsi"></textarea></div>
+  <div class="actions">
+    <button id="saveDynamicFacilityBtn" class="primary" type="submit">Simpan Fasilitas</button>
+    <button id="cancelDynamicFacilityBtn" class="secondary" type="button">Batal</button>
+  </div>
+</form>
+<div id="dynamicStatus" class="status" role="status" aria-live="polite"></div>
 <div id="dynamicFacilityList" class="gallery"></div>
 </div>
 
@@ -1056,41 +1067,141 @@ if(accessToken && currentUserId===ADMIN_UID){
 
 
 <script>
-// Modul fasilitas dinamis website_content
-async function loadDynamicFacilities(){
-  const res = await apiFetch('/rest/v1/website_content?bagian=eq.fasilitas&select=*');
-  const data = await res.json();
-  const box = document.getElementById('dynamicFacilityList');
-  if(!box) return;
-  box.innerHTML = data.map(x=>`
-    <div class="item">
-      <div class="item-body">
-        <h3>${x.judul || ''}</h3>
-        <p>${x.deskripsi || ''}</p>
-        <button class="secondary" onclick="editDynamicFacility(${x.id})">Edit</button>
-        <button class="danger" onclick="deleteDynamicFacility(${x.id})">Hapus</button>
-      </div>
-    </div>
-  `).join('');
+// Modul fasilitas dinamis: memakai tabel website_content dan sesi login yang sudah ada.
+let dynamicFacilities=[];
+let dynamicBusy=false;
+let dynamicLoadSequence=0;
+let dynamicEditingId=null;
+function dynamicLoggedIn(){return !!accessToken && currentUserId===ADMIN_UID}
+function dynamicLock(locked){
+  dynamicBusy=locked;
+  document.querySelectorAll('#dynamicFacilityManager button, #dynamicFacilityForm input, #dynamicFacilityForm textarea').forEach(el=>el.disabled=locked);
 }
-
-async function deleteDynamicFacility(id){
-  if(!confirm('Hapus fasilitas ini?')) return;
-  await apiFetch('/rest/v1/website_content?id=eq.'+id,{
-    method:'DELETE'
+function dynamicReset(){
+  dynamicEditingId=null;
+  $('dynamicJudul').value='';$('dynamicDeskripsi').value='';
+  $('dynamicFormTitle').textContent='Tambah Fasilitas';
+  $('dynamicFacilityForm').classList.add('hidden');
+}
+async function dynamicResponse(res){
+  const raw=await res.text();let data;
+  try{data=JSON.parse(raw)}catch(_){data=null}
+  if(!res.ok) throw new Error(data?.message || data?.error_description || raw || 'Permintaan gagal.');
+  if(!Array.isArray(data)) throw new Error('Respons fasilitas tidak valid.');
+  return data;
+}
+async function dynamicAuthorizedRequest(){
+  if(!dynamicLoggedIn()) throw new Error('Silakan login sebagai admin terlebih dahulu.');
+  const token=accessToken;
+  const request=(path,options={})=>{
+    if(!dynamicLoggedIn() || accessToken!==token) throw new Error('Sesi berubah. Silakan login kembali.');
+    return apiFetch(path,{...options,headers:{...options.headers,Authorization:'Bearer '+token}},false);
+  };
+  const res=await request('/auth/v1/user');
+  if(!res.ok) throw new Error('Sesi kedaluwarsa. Silakan logout lalu login kembali.');
+  const user=await res.json();
+  if(user.id!==ADMIN_UID) throw new Error('Akun ini tidak memiliki hak admin.');
+  return request;
+}
+function renderDynamicFacilities(){
+  const box=$('dynamicFacilityList');box.replaceChildren();
+  if(!dynamicFacilities.length){box.textContent='Belum ada fasilitas. Klik Tambahkan Fasilitas untuk memulai.';return}
+  dynamicFacilities.forEach(item=>{
+    const card=document.createElement('div');card.className='item';
+    const body=document.createElement('div');body.className='item-body';
+    const title=document.createElement('h3');title.textContent=item.judul || 'Tanpa judul';
+    const desc=document.createElement('p');desc.textContent=item.deskripsi || '';desc.style.whiteSpace='pre-wrap';
+    const actions=document.createElement('div');actions.className='item-actions';
+    const edit=document.createElement('button');edit.type='button';edit.className='secondary';edit.textContent='Edit';edit.disabled=dynamicBusy;
+    edit.addEventListener('click',()=>editDynamicFacility(item.id));
+    const del=document.createElement('button');del.type='button';del.className='danger';del.textContent='Hapus';del.disabled=dynamicBusy;
+    del.addEventListener('click',()=>deleteDynamicFacility(item.id));
+    actions.append(edit,del);body.append(title,desc,actions);card.append(body);box.append(card);
   });
-  loadDynamicFacilities();
 }
-
-function editDynamicFacility(id){
-  alert('Edit fasilitas ID '+id+' akan menggunakan form dinamis.');
-}
-
-document.addEventListener('DOMContentLoaded',()=>{
-  if(document.getElementById('dynamicFacilityList')){
-    loadDynamicFacilities();
+async function loadDynamicFacilities(){
+  const seq=++dynamicLoadSequence;
+  if(!dynamicLoggedIn()){dynamicFacilities=[];$('dynamicFacilityList').replaceChildren();return false}
+  const token=accessToken;
+  try{
+    const res=await apiFetch('/rest/v1/website_content?bagian=eq.fasilitas&select=id,bagian,tipe,judul,deskripsi&order=id.asc');
+    const rows=await dynamicResponse(res);
+    if(seq!==dynamicLoadSequence || !dynamicLoggedIn() || token!==accessToken) return false;
+    dynamicFacilities=rows;renderDynamicFacilities();return true;
+  }catch(err){
+    if(seq===dynamicLoadSequence && dynamicLoggedIn()){
+      $('dynamicFacilityList').replaceChildren();
+      setStatus('dynamicStatus','Fasilitas gagal dimuat: '+err.message,'err');
+    }
+    return false;
   }
+}
+function editDynamicFacility(id){
+  if(dynamicBusy || !dynamicLoggedIn()) return;
+  const item=dynamicFacilities.find(x=>String(x.id)===String(id));
+  if(!item) return setStatus('dynamicStatus','Data tidak ditemukan. Klik Muat Ulang.','err');
+  dynamicEditingId=item.id;
+  $('dynamicJudul').value=item.judul || '';$('dynamicDeskripsi').value=item.deskripsi || '';
+  $('dynamicFormTitle').textContent='Edit Fasilitas';
+  $('dynamicFacilityForm').classList.remove('hidden');clearStatus('dynamicStatus');$('dynamicJudul').focus();
+}
+async function saveDynamicFacility(event){
+  event.preventDefault();
+  if(dynamicBusy) return;
+  clearStatus('dynamicStatus');
+  const judul=$('dynamicJudul').value.trim(),deskripsi=$('dynamicDeskripsi').value.trim();
+  if(!judul) return setStatus('dynamicStatus','Judul fasilitas wajib diisi.','err');
+  const id=dynamicEditingId;
+  dynamicLock(true);$('saveDynamicFacilityBtn').textContent='Menyimpan...';
+  try{
+    const request=await dynamicAuthorizedRequest();
+    const editing=id!==null;
+    const path='/rest/v1/website_content'+(editing?'?bagian=eq.fasilitas&id=eq.'+encodeURIComponent(id):'');
+    const body=editing?{judul,deskripsi}:{bagian:'fasilitas',tipe:'card',judul,deskripsi};
+    const saved=await dynamicResponse(await request(path,{
+      method:editing?'PATCH':'POST',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(body)
+    }));
+    if(saved.length!==1 || saved[0].id==null) throw new Error('Tidak ada satu baris yang dikonfirmasi tersimpan. Periksa izin atau muat ulang data.');
+    // Tutup form setelah server mengonfirmasi agar POST tidak terulang ketika refresh gagal.
+    dynamicReset();
+    const verified=await dynamicResponse(await request('/rest/v1/website_content?bagian=eq.fasilitas&id=eq.'+encodeURIComponent(saved[0].id)+'&select=id,judul,deskripsi'));
+    if(verified.length!==1 || verified[0].judul!==judul || verified[0].deskripsi!==deskripsi)
+      throw new Error('Data telah dikirim, tetapi hasil baca ulang berbeda. Klik Muat Ulang untuk memeriksa.');
+    if(await loadDynamicFacilities()) setStatus('dynamicStatus','Fasilitas berhasil disimpan dan dibaca ulang dari Supabase.','ok');
+  }catch(err){setStatus('dynamicStatus','Penyimpanan belum terkonfirmasi: '+err.message,'err')}
+  finally{dynamicLock(false);$('saveDynamicFacilityBtn').textContent='Simpan Fasilitas'}
+}
+async function deleteDynamicFacility(id){
+  if(dynamicBusy || !dynamicLoggedIn()) return;
+  const item=dynamicFacilities.find(x=>String(x.id)===String(id));
+  if(!item || !confirm('Hapus fasilitas "'+(item.judul || 'Tanpa judul')+'"?')) return;
+  clearStatus('dynamicStatus');dynamicLock(true);
+  try{
+    const request=await dynamicAuthorizedRequest();
+    const path='/rest/v1/website_content?bagian=eq.fasilitas&id=eq.'+encodeURIComponent(id);
+    const deleted=await dynamicResponse(await request(path,{method:'DELETE',headers:{'Prefer':'return=representation'}}));
+    if(deleted.length!==1) throw new Error('Tidak ada satu baris yang dikonfirmasi terhapus. Klik Muat Ulang untuk memeriksa.');
+    const remaining=await dynamicResponse(await request(path+'&select=id'));
+    if(remaining.length) throw new Error('Data masih ditemukan setelah penghapusan.');
+    if(String(dynamicEditingId)===String(id)) dynamicReset();
+    if(await loadDynamicFacilities()) setStatus('dynamicStatus','Fasilitas berhasil dihapus.','ok');
+  }catch(err){setStatus('dynamicStatus','Penghapusan belum terkonfirmasi: '+err.message,'err')}
+  finally{dynamicLock(false)}
+}
+$('addDynamicFacilityBtn').addEventListener('click',()=>{
+  if(dynamicBusy || !dynamicLoggedIn()) return;
+  dynamicReset();clearStatus('dynamicStatus');$('dynamicFacilityForm').classList.remove('hidden');$('dynamicJudul').focus();
 });
+$('cancelDynamicFacilityBtn').addEventListener('click',dynamicReset);
+$('dynamicFacilityForm').addEventListener('submit',saveDynamicFacility);
+$('refreshDynamicFacilityBtn').addEventListener('click',()=>{clearStatus('dynamicStatus');loadDynamicFacilities()});
+// Amati tampilan login yang sudah ada, tanpa mengganti fungsi atau event login.
+new MutationObserver(()=>{
+  if($('adminBox').classList.contains('hidden')){
+    ++dynamicLoadSequence;dynamicFacilities=[];dynamicReset();$('dynamicFacilityList').replaceChildren();clearStatus('dynamicStatus');
+  }else loadDynamicFacilities();
+}).observe($('adminBox'),{attributes:true,attributeFilter:['class']});
+if(dynamicLoggedIn()) loadDynamicFacilities();
 </script>
 
 </body>
