@@ -412,9 +412,9 @@ dialog::backdrop{background:rgba(0,0,0,.55)} .dialog-body{padding:22px}
       </div>
     </div>
 <div class="card" id="dynamicFacilityManager">
-<h2>Fasilitas Website Dinamis</h2>
+<h2><button id="openDynamicFacilityBtn" type="button" aria-controls="dynamicFacilityForm" style="font:inherit;color:inherit;background:transparent;padding:0;text-align:left">Fasilitas Website Dinamis</button></h2>
 <div class="profile-note">
-Fasilitas tambahan akan tampil setelah enam laboratorium utama pada bagian Fasilitas Kami.
+Isi formulir Nama Laboratorium, Keterangan, dan Foto di bawah, lalu klik Simpan Fasilitas. Fasilitas tambahan akan tampil setelah enam laboratorium utama pada bagian Fasilitas Kami.
 </div>
 
 
@@ -424,7 +424,7 @@ Fasilitas tambahan akan tampil setelah enam laboratorium utama pada bagian Fasil
 <div class="actions"><button id="addDynamicFacilityBtn" class="primary" type="button">
 + Tambahkan Fasilitas Baru
 </button></div>
-<form id="dynamicFacilityForm" class="hidden" style="margin-top:18px">
+<form id="dynamicFacilityForm" style="margin-top:18px;border-top:1px solid var(--border);padding-top:18px" aria-labelledby="dynamicFormTitle">
   <h3 id="dynamicFormTitle">Tambah Fasilitas</h3>
   <div class="field"><label for="dynamicJudul">Nama Laboratorium</label><input id="dynamicJudul" required></div>
   <div class="field"><label for="dynamicDeskripsi">Deskripsi / Keterangan</label><textarea id="dynamicDeskripsi"></textarea></div>
@@ -1091,9 +1091,20 @@ let dynamicBusy=false,dynamicLoadSequence=0,dynamicEditingId=null;
 let facilityHeaderId=null,facilityHeaderLoaded=false,facilityHeaderBusy=false,facilityHeaderDirty=false;
 let dynamicPreviewUrl='';
 function dynamicLoggedIn(){return !!accessToken && currentUserId===ADMIN_UID}
+async function dynamicFetch(path,options={},auth=true){
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),20000);
+  try{
+    return await apiFetch(path,{...options,signal:controller.signal},auth);
+  }catch(err){
+    if(err.name==='AbortError') throw new Error('Koneksi terlalu lama. Muat ulang daftar untuk memeriksa hasil sebelum mencoba menyimpan lagi.');
+    throw err;
+  }finally{clearTimeout(timeout)}
+}
+
 function dynamicLock(locked){
   dynamicBusy=locked;
-  document.querySelectorAll('#dynamicFacilityManager button, #dynamicFacilityForm input, #dynamicFacilityForm textarea').forEach(el=>el.disabled=locked);
+  document.querySelectorAll('#dynamicFacilityManager button:not(#addDynamicFacilityBtn):not(#openDynamicFacilityBtn):not(#refreshDynamicFacilityBtn), #dynamicFacilityForm input, #dynamicFacilityForm textarea').forEach(el=>el.disabled=locked);
 }
 function dynamicReset(){
   dynamicEditingId=null;
@@ -1101,7 +1112,7 @@ function dynamicReset(){
   if(dynamicPreviewUrl){URL.revokeObjectURL(dynamicPreviewUrl);dynamicPreviewUrl=''}
   $('dynamicPhotoPreview').removeAttribute('src');$('dynamicPhotoPreview').style.display='none';
   $('dynamicFormTitle').textContent='Tambah Fasilitas';
-  $('dynamicFacilityForm').classList.add('hidden');
+  $('dynamicFacilityForm').classList.remove('hidden');
 }
 async function dynamicResponse(res){
   const raw=await res.text();let data;
@@ -1115,7 +1126,7 @@ async function dynamicAuthorizedRequest(){
   const token=accessToken;
   const request=(path,options={})=>{
     if(!dynamicLoggedIn() || accessToken!==token) throw new Error('Sesi berubah. Silakan login kembali.');
-    return apiFetch(path,{...options,headers:{...options.headers,Authorization:'Bearer '+token}},false);
+    return dynamicFetch(path,{...options,headers:{...options.headers,Authorization:'Bearer '+token}},false);
   };
   const res=await request('/auth/v1/user');
   if(!res.ok) throw new Error('Sesi kedaluwarsa. Silakan logout lalu login kembali.');
@@ -1153,8 +1164,8 @@ async function loadDynamicFacilities(){
   const token=accessToken;
   try{
     const results=await Promise.all([
-      apiFetch('/rest/v1/website_content?bagian=eq.fasilitas&select=id,bagian,tipe,judul,deskripsi&order=id.asc').then(dynamicResponse),
-      apiFetch('/rest/v1/galery?name_foto=like.website%2Ffasilitas-dinamis%2F*&select=id,name_foto,url_foto&order=created_at.desc').then(dynamicResponse)
+      dynamicFetch('/rest/v1/website_content?bagian=eq.fasilitas&select=id,bagian,tipe,judul,deskripsi&order=id.asc').then(dynamicResponse),
+      dynamicFetch('/rest/v1/galery?name_foto=like.website%2Ffasilitas-dinamis%2F*&select=id,name_foto,url_foto&order=created_at.desc').then(dynamicResponse)
     ]);
     if(seq!==dynamicLoadSequence || !dynamicLoggedIn() || token!==accessToken) return false;
     dynamicFacilities=results[0].filter(row=>row.tipe!==FACILITY_HEADER_TYPE);
@@ -1247,7 +1258,7 @@ async function loadFacilityHeader(){
   if(!dynamicLoggedIn() || facilityHeaderBusy || facilityHeaderDirty) return;
   const token=accessToken;headerLock(true);facilityHeaderLoaded=false;clearStatus('facilityHeaderStatus');
   try{
-    const rows=await dynamicResponse(await apiFetch('/rest/v1/website_content?bagian=eq.fasilitas&tipe=eq.section_header&select=id,judul,deskripsi'));
+    const rows=await dynamicResponse(await dynamicFetch('/rest/v1/website_content?bagian=eq.fasilitas&tipe=eq.section_header&select=id,judul,deskripsi'));
     if(token!==accessToken || !dynamicLoggedIn()) return;
     if(rows.length>1) throw new Error('Ada lebih dari satu judul bagian. Data perlu diperiksa.');
     facilityHeaderId=rows[0]?.id ?? null;
@@ -1278,13 +1289,32 @@ async function saveFacilityHeader(event){
   }catch(err){setStatus('facilityHeaderStatus','Penyimpanan belum terkonfirmasi: '+err.message,'err')}
   finally{facilityHeaderBusy=false;headerLock(false)}
 }
-$('addDynamicFacilityBtn').addEventListener('click',()=>{
-  if(dynamicBusy || !dynamicLoggedIn()) return;
-  dynamicReset();clearStatus('dynamicStatus');$('dynamicFacilityForm').classList.remove('hidden');$('dynamicJudul').focus();
-});
+function openDynamicFacilityForm(startNew=false){
+  if(!dynamicLoggedIn()){
+    setStatus('dynamicStatus','Sesi admin tidak dikenali. Silakan logout lalu login kembali.','err');
+    $('dynamicStatus').scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  if(dynamicBusy){
+    setStatus('dynamicStatus','Penyimpanan masih berjalan. Tunggu hasilnya sebelum membuka fasilitas lain.','');
+    $('dynamicStatus').scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  if(startNew && dynamicEditingId!==null) dynamicReset();
+  $('dynamicFacilityForm').classList.remove('hidden');
+  setStatus('dynamicStatus','Formulir siap. Isi nama laboratorium, keterangan, dan foto, lalu klik Simpan Fasilitas.','ok');
+  $('dynamicFacilityForm').scrollIntoView({behavior:'smooth',block:'center'});
+  $('dynamicJudul').focus({preventScroll:true});
+}
+$('addDynamicFacilityBtn').addEventListener('click',()=>openDynamicFacilityForm(true));
+$('openDynamicFacilityBtn').addEventListener('click',()=>openDynamicFacilityForm(false));
 $('cancelDynamicFacilityBtn').addEventListener('click',dynamicReset);
 $('dynamicFacilityForm').addEventListener('submit',saveDynamicFacility);
-$('refreshDynamicFacilityBtn').addEventListener('click',()=>{if(!dynamicBusy){clearStatus('dynamicStatus');loadDynamicFacilities()}});
+$('refreshDynamicFacilityBtn').addEventListener('click',async()=>{
+  if(!dynamicLoggedIn() || dynamicBusy){openDynamicFacilityForm(false);return}
+  setStatus('dynamicStatus','Memuat fasilitas...','');
+  if(await loadDynamicFacilities()) setStatus('dynamicStatus','Daftar fasilitas sudah diperbarui.','ok');
+});
 $('dynamicPhotoFile').addEventListener('change',()=>{
   if(dynamicPreviewUrl){URL.revokeObjectURL(dynamicPreviewUrl);dynamicPreviewUrl=''}
   const file=$('dynamicPhotoFile').files[0];
