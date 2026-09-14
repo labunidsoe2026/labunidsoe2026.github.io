@@ -1135,5 +1135,75 @@ document.addEventListener("keydown", function(event) {
 loadGalleryFromSupabase();
 </script>
 
+<script>
+// Baca fasilitas tanpa hak tulis; tetap tampilkan enam kartu asli bila koneksi gagal.
+(async function loadFacilitiesFromSupabase(){
+  const section=document.getElementById('laboratorium');
+  const grid=section.querySelector('.lab-grid');
+  const originalCards=[...grid.querySelectorAll('.lab-card')];
+  const read=async path=>{
+    const res=await fetch(SUPABASE_URL+path,{headers:{apikey:SUPABASE_KEY}});
+    if(!res.ok) throw new Error('Data fasilitas belum dapat dimuat.');
+    const rows=await res.json();if(!Array.isArray(rows)) throw new Error('Data fasilitas tidak valid.');
+    return rows;
+  };
+  const results=await Promise.allSettled([
+    read('/rest/v1/galery?select=id,name_foto,nama_file,judul,keterangan,url_foto&order=created_at.desc'),
+    read('/rest/v1/website_content?bagian=eq.fasilitas&select=id,tipe,judul,deskripsi&order=id.asc')
+  ]);
+  const photos=results[0].status==='fulfilled'?results[0].value:[];
+  const content=results[1].status==='fulfilled'?results[1].value:[];
+  function setImage(img,url,title){
+    if(!url) return;
+    try{if(!['http:','https:'].includes(new URL(url,location.href).protocol)) return}catch(_){return}
+    const previous=img.getAttribute('src');
+    img.onerror=()=>{img.onerror=null;if(previous && previous!==url) img.src=previous;else img.style.display='none'};
+    img.src=url;img.alt=title || 'Foto laboratorium';
+  }
+  originalCards.forEach((card,index)=>{
+    const marker='website/fasilitas-'+(index+1);
+    const url=SUPABASE_URL+'/storage/v1/object/public/galery/'+marker;
+    const photo=photos.find(row=>row.name_foto===marker || row.nama_file===marker || (row.url_foto||'').split(/[?#]/)[0]===url);
+    if(!photo) return;
+    if(photo.judul!=null) card.querySelector('h3').textContent=photo.judul;
+    if(photo.keterangan!=null) card.querySelector('p').textContent=photo.keterangan;
+    setImage(card.querySelector('img'),photo.url_foto,photo.judul);
+  });
+  const heading=content.find(row=>row.tipe==='section_header');
+  if(heading){
+    if(heading.judul!=null) section.querySelector('.section-title h2').textContent=heading.judul;
+    if(heading.deskripsi!=null) section.querySelector('.section-title p').textContent=heading.deskripsi;
+  }
+  content.filter(row=>row.tipe!=='section_header').forEach(item=>{
+    const card=document.createElement('div');card.className='lab-card';
+    const photo=photos.find(row=>row.name_foto==='website/fasilitas-dinamis/'+item.id);
+    if(photo?.url_foto){
+      const img=document.createElement('img');img.loading='lazy';setImage(img,photo.url_foto,item.judul);card.append(img);
+    }
+    const body=document.createElement('div');body.className='lab-content';
+    const title=document.createElement('h3');title.textContent=item.judul || 'Laboratorium';
+    const desc=document.createElement('p');desc.textContent=item.deskripsi || '';desc.style.whiteSpace='pre-wrap';
+    body.append(title,desc);card.append(body);grid.append(card);
+  });
+  if(results.some(result=>result.status==='rejected')){
+    const note=document.createElement('p');note.style.cssText='text-align:center;color:#667085;margin-top:20px;font-size:13px';
+    note.textContent='Sebagian pembaruan fasilitas belum dapat dimuat. Silakan muat ulang halaman.';
+    section.querySelector('.container').append(note);
+  }
+  // Pintasan hanya muncul untuk sesi admin yang diverifikasi oleh Supabase.
+  const token=sessionStorage.getItem('lab_access_token');
+  if(token){
+    try{
+      const res=await fetch(SUPABASE_URL+'/auth/v1/user',{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+token}});
+      if(res.ok && (await res.json()).id==='5a12f804-2471-47d5-8605-ae8cd7c99b10'){
+        const box=document.createElement('div');box.style.cssText='text-align:center;margin-top:28px';
+        const link=document.createElement('a');link.href='admin.html#tambah-fasilitas';link.className='btn';
+        link.textContent='+ Tambahkan Fasilitas Baru';box.append(link);section.querySelector('.container').append(box);
+      }
+    }catch(_){/* Tidak menampilkan kontrol admin bila sesi tidak dapat diverifikasi. */}
+  }
+})();
+
+</script>
 </body>
 </html>
