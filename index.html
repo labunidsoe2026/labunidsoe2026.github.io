@@ -269,13 +269,20 @@
 
         /* LAB CARD */
 
+        /* Kolase: setiap kartu mengikuti tinggi foto aslinya. */
         .lab-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
+            display: block;
+            column-count: 3;
+            column-gap: 24px;
         }
 
         .lab-card {
+            display: inline-block;
+            vertical-align: top;
+            width: 100%;
+            margin-bottom: 24px;
+            break-inside: avoid;
+            page-break-inside: avoid;
             background: white;
             border-radius: 15px;
             overflow: hidden;
@@ -289,9 +296,10 @@
         }
 
         .lab-card img {
+            display: block;
             width: 100%;
-            height: 210px;
-            object-fit: cover;
+            height: auto;
+            object-fit: contain;
         }
 
         .lab-content {
@@ -498,7 +506,7 @@
             }
 
             .lab-grid {
-                grid-template-columns: repeat(2,1fr);
+                column-count: 2;
             }
 
             .feature-grid {
@@ -524,7 +532,10 @@
                 font-size: 16px;
             }
 
-            .lab-grid,
+            .lab-grid {
+                column-count: 1;
+            }
+
             .feature-grid,
             .gallery-grid {
                 grid-template-columns: 1fr;
