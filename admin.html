@@ -1,1351 +1,1220 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin Laboratorium Terpadu</title>
-<style>
-:root{--p:#0b5d4b;--d:#063c31;--bg:#f4f7f6;--mut:#667085;--danger:#b42318;--border:#e5e7eb;--soft:#eef6f3}
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:#1f2937}
-header{background:linear-gradient(135deg,var(--d),var(--p));color:#fff;padding:20px 24px}
-.wrap{width:min(1180px,calc(100% - 28px));margin:auto}
-header .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px}
-header h1{font-size:23px;margin:0}
-header p{margin:4px 0 0;color:#d6ebe5;font-size:13px}
-main{padding:30px 0 60px}
-.card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:23px;box-shadow:0 8px 28px rgba(0,0,0,.05);margin-bottom:22px}
-.login{max-width:480px;margin:60px auto}
-h2{margin:0 0 18px;color:var(--d)} h3{color:var(--d)}
-.field{display:grid;gap:7px;margin-bottom:14px}
-label{font-weight:700;font-size:13px}
-input,textarea,select{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:10px;font:inherit;background:#fff}
-textarea{min-height:92px;resize:vertical}
-button{border:0;border-radius:10px;padding:11px 15px;font-weight:700;cursor:pointer}
-button:disabled{opacity:.55;cursor:not-allowed}
-.primary{background:var(--p);color:#fff}
-.secondary{background:#eef2f1;color:#344054}
-.danger{background:#fee4e2;color:var(--danger)}
-.light{background:white;color:var(--d)}
-.hidden{display:none!important}
-.status{display:none;margin-top:12px;padding:11px 12px;border-radius:10px;font-size:13px}
-.status.show{display:block} .status.ok{background:#ecfdf3;color:#027a48} .status.err{background:#fef3f2;color:#b42318}
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px} .full{grid-column:1/-1}
-.small{font-size:12px;color:var(--mut)}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-.admin-menu{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff;border:1px solid var(--border);border-radius:15px;padding:10px;margin-bottom:22px}
-.admin-menu button{background:transparent;color:#475467}
-.admin-menu button.active{background:var(--p);color:#fff}
-.website-link{margin-left:auto;display:inline-flex;padding:11px 15px;border-radius:10px;background:#eef2f1;color:var(--d);font-weight:700;text-decoration:none}
-.panel.hidden-panel{display:none}
+    <title>Laboratorium Terpadu | Universitas Dr. Soekardjo Banyuwangi</title>
 
-.toolbar{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
-.filters{display:grid;grid-template-columns:1.2fr .8fr;gap:12px;margin-top:16px}
-.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:18px}
-.item{border:1px solid var(--border);border-radius:15px;overflow:hidden;background:#fff}
-.item img{width:100%;height:190px;object-fit:cover;background:#e5e7eb}
-.item-body{padding:15px}
-.item h3{margin:8px 0}
-.badge{display:inline-block;padding:4px 9px;border-radius:999px;background:#eaf5f2;color:var(--p);font-size:11px;font-weight:700}
-.desc{font-size:13px;color:var(--mut);min-height:38px}
-.item-actions{display:flex;gap:8px;margin-top:13px}
-.item-actions button{flex:1}
+    <meta name="description"
+          content="Galeri Laboratorium Terpadu Universitas Dr. Soekardjo Banyuwangi">
 
-.category-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:18px}
-.category-card{background:#fff;border:1px solid var(--border);border-radius:15px;padding:18px}
-.category-card strong{display:block;color:var(--d);font-size:18px}
-.category-card span{color:var(--mut);font-size:13px}
+    <style>
 
-.bulk-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px;max-height:430px;overflow:auto;padding-right:4px}
-.bulk-row{display:flex;gap:10px;align-items:center;border:1px solid var(--border);border-radius:12px;padding:10px;background:#fff}
-.bulk-row img{width:64px;height:54px;object-fit:cover;border-radius:8px}
-.bulk-row input{width:auto}
-.bulk-meta{min-width:0}
-.bulk-meta strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bulk-meta span{font-size:12px;color:var(--mut)}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
 
-.profile-note{padding:14px 16px;background:#f0f7f5;border-radius:12px;color:#475467;font-size:13px;margin-bottom:20px}
-.logo-grid{display:grid;grid-template-columns:340px 1fr;gap:28px;align-items:center}
-.logo-preview{min-height:170px;padding:20px;border:1px dashed #b8c4c0;border-radius:18px;background:#f8faf9;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.logo-preview img{width:100%;height:130px;object-fit:contain;display:none}
-.logo-fallback{display:inline-flex;align-items:center;justify-content:center;min-width:90px;height:58px;padding:0 18px;border-radius:12px;background:linear-gradient(135deg,var(--p),var(--d));color:#fff;font-size:24px;font-weight:800}
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f7f8;
+            color: #1f2937;
+            line-height: 1.6;
+        }
 
-dialog{border:0;border-radius:16px;width:min(540px,calc(100% - 30px));padding:0;box-shadow:0 20px 70px rgba(0,0,0,.25)}
-dialog::backdrop{background:rgba(0,0,0,.55)} .dialog-body{padding:22px}
+        /* NAVBAR */
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(255,255,255,0.96);
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+        }
+
+        .navbar {
+            max-width: 1200px;
+            margin: auto;
+            padding: 16px 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 150px;
+            height: 58px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            flex-shrink: 0;
+            overflow: hidden;
+            background: transparent;
+        }
+
+        .brand-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: left center;
+            background: transparent;
+            padding: 0;
+        }
+
+        .brand-logo span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 58px;
+            height: 48px;
+            padding: 0 14px;
+            border-radius: 12px;
+            background: linear-gradient(135deg,#0b6b50,#064e3b);
+            color: white;
+            font-weight: 800;
+            letter-spacing: .5px;
+        }
+
+        nav a.admin-nav {
+            background: #065f46;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-left: 28px;
+            box-shadow: 0 5px 14px rgba(6,95,70,.18);
+            white-space: nowrap;
+        }
+
+        nav a.admin-nav:hover {
+            background: #064e3b;
+            color: white;
+        }
+
+        .brand h3 {
+            color: #064e3b;
+            font-size: 17px;
+        }
+
+        .brand small {
+            color: #6b7280;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #374151;
+            margin-left: 22px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        nav a:hover {
+            color: #059669;
+        }
+
+        /* HERO */
+
+        .hero {
+            min-height: 86vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+
+            background:
+            linear-gradient(
+                rgba(2, 44, 34, 0.82),
+                rgba(2, 78, 59, 0.72)
+            ),
+            url("https://plottbyxuuqzlppytkqj.supabase.co/storage/v1/object/public/galery/website/hero");
+
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 40px 20px;
+        }
+
+        .hero-content {
+            max-width: 900px;
+        }
+
+        .hero-label {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.35);
+            padding: 7px 16px;
+            border-radius: 30px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .hero h1 {
+            font-size: 52px;
+            line-height: 1.15;
+            margin-bottom: 18px;
+        }
+
+        .hero p {
+            font-size: 19px;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            color: #ecfdf5;
+        }
+
+        .btn {
+            display: inline-block;
+            text-decoration: none;
+            background: white;
+            color: #065f46;
+            padding: 14px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            margin: 5px;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 1px solid white;
+        }
+
+        /* SECTION */
+
+        section {
+            padding: 85px 25px;
+        }
+
+        .container {
+            max-width: 1150px;
+            margin: auto;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .section-title span {
+            color: #059669;
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .section-title h2 {
+            color: #064e3b;
+            font-size: 34px;
+            margin: 5px 0 10px;
+        }
+
+        .section-title p {
+            color: #6b7280;
+            max-width: 700px;
+            margin: auto;
+        }
+
+        /* ABOUT */
+
+        .about {
+            background: white;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 45px;
+            align-items: center;
+        }
+
+        .about-image {
+            height: 400px;
+            border-radius: 18px;
+            overflow: hidden;
+        }
+
+        .about-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .about-text h2 {
+            font-size: 34px;
+            color: #064e3b;
+            margin-bottom: 15px;
+        }
+
+        .about-text p {
+            color: #5b6470;
+            margin-bottom: 15px;
+        }
+
+        /* LAB CARD */
+
+        /* Kolase: setiap kartu mengikuti tinggi foto aslinya. */
+        .lab-grid {
+            display: block;
+            column-count: 3;
+            column-gap: 24px;
+        }
+
+        .lab-card {
+            display: inline-block;
+            vertical-align: top;
+            width: 100%;
+            margin-bottom: 24px;
+            break-inside: avoid;
+            page-break-inside: avoid;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.07);
+            transition: 0.3s;
+        }
+
+        .lab-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+        }
+
+        .lab-card img {
+            display: block;
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .lab-content {
+            padding: 22px;
+        }
+
+        .lab-content h3 {
+            color: #065f46;
+            margin-bottom: 10px;
+        }
+
+        .lab-content p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        /* FEATURES */
+
+        .features {
+            background: #064e3b;
+            color: white;
+        }
+
+        .features .section-title h2 {
+            color: white;
+        }
+
+        .features .section-title p {
+            color: #d1fae5;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 20px;
+        }
+
+        .feature-card {
+            background: rgba(255,255,255,0.09);
+            border: 1px solid rgba(255,255,255,0.16);
+            padding: 30px 20px;
+            border-radius: 14px;
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            color: #d1fae5;
+            font-size: 14px;
+        }
+
+        /* GALLERY */
+
+        .gallery {
+            background: white;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 15px;
+        }
+
+        .gallery-grid img {
+            width: 100%;
+            height: 260px;
+            object-fit: cover;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .gallery-grid img:hover {
+            transform: scale(1.02);
+        }
 
 
-.site-photo-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:18px;
-  margin-top:18px;
-}
-.site-photo-card{
-  align-self:start;
-  background:#fff;
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:16px;
-}
-.site-photo-card h3{
-  margin:0 0 5px;
-  font-size:17px;
-}
-.site-photo-card p{
-  margin:0 0 12px;
-  color:var(--mut);
-  font-size:12px;
-}
-.site-photo-preview{
-  width:100%;
-  height:auto;
-  border-radius:12px;
-  overflow:hidden;
-  background:#f4f7f6;
-  border:1px dashed #cbd5d1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  margin-bottom:12px;
-}
-.site-photo-preview img{
-  width:100%;
-  height:auto;
-  object-fit:contain;
-  display:none;
-}
-.site-photo-placeholder{
-  color:#667085;
-  font-size:13px;
-  text-align:center;
-  padding:16px;
-}
-.site-photo-card input[type=file]{
-  margin-bottom:10px;
-}
-.site-photo-status{
-  margin-top:8px;
-  font-size:12px;
-}
-@media(max-width:760px){
-  .site-photo-grid{grid-template-columns:1fr}
-}
+        .gallery-status {
+            text-align: center;
+            margin: -25px auto 28px;
+            color: #6b7280;
+            font-size: 13px;
+        }
 
-@media(max-width:900px){
- .gallery,.category-grid{grid-template-columns:repeat(2,1fr)}
- .logo-grid{grid-template-columns:1fr}
-}
-@media(max-width:650px){
- header .wrap{flex-direction:column;align-items:flex-start}
- .grid,.gallery,.category-grid,.filters,.bulk-list{grid-template-columns:1fr}
- .full{grid-column:auto}
- .website-link{margin-left:0}
-}
-</style>
+        .gallery-card {
+            background: #ffffff;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 6px 22px rgba(0,0,0,0.07);
+            border: 1px solid #eef0f1;
+        }
+
+        .gallery-card img {
+            border-radius: 0;
+        }
+
+        .gallery-caption {
+            padding: 14px 15px 16px;
+        }
+
+        .gallery-category {
+            display: inline-block;
+            background: #ecfdf5;
+            color: #047857;
+            border-radius: 999px;
+            padding: 4px 9px;
+            margin-bottom: 7px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .gallery-caption h3 {
+            margin: 0 0 5px;
+            color: #064e3b;
+            font-size: 16px;
+            line-height: 1.35;
+        }
+
+        .gallery-caption p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 13px;
+            line-height: 1.55;
+        }
+
+        .footer-admin-link {
+            display: inline-block;
+            margin-top: 12px;
+            color: #d1fae5;
+            font-size: 12px;
+            opacity: .75;
+        }
+
+        .footer-admin-link:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        /* CONTACT */
+
+        .contact-box {
+            background: #ecfdf5;
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+        }
+
+        .contact-box h2 {
+            color: #064e3b;
+            margin-bottom: 15px;
+        }
+
+        .contact-box p {
+            color: #5b6470;
+        }
+
+        /* FOOTER */
+
+        footer {
+            background: #022c22;
+            color: #d1fae5;
+            padding: 45px 20px;
+            text-align: center;
+        }
+
+        footer h3 {
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        footer p {
+            font-size: 14px;
+        }
+
+        .copyright {
+            margin-top: 25px;
+            border-top: 1px solid rgba(255,255,255,0.15);
+            padding-top: 20px;
+            font-size: 13px;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 900px) {
+
+            nav {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 38px;
+            }
+
+            .about-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .lab-grid {
+                column-count: 2;
+            }
+
+            .feature-grid {
+                grid-template-columns: repeat(2,1fr);
+            }
+
+            .gallery-grid {
+                grid-template-columns: repeat(2,1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .brand h3 {
+                font-size: 14px;
+            }
+
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .hero p {
+                font-size: 16px;
+            }
+
+            .lab-grid {
+                column-count: 1;
+            }
+
+            .feature-grid,
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .gallery-grid img {
+                height: 230px;
+            }
+
+            .contact-box {
+                padding: 35px 20px;
+            }
+        }
+
+
+        @media (max-width: 700px) {
+            .brand-logo {
+                width: 110px;
+                height: 48px;
+            }
+        }
+
+    </style>
 </head>
+
 <body>
 
 <header>
-<div class="wrap">
-  <div>
-    <h1>Admin Laboratorium Terpadu</h1>
-    <p>Universitas Dr. Soekardjo Banyuwangi</p>
-  </div>
-  <button id="logoutBtn" class="light hidden" type="button">Logout</button>
-</div>
+
+    <div class="navbar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                <span id="labLogoFallback">LAB</span>
+                <img id="labLogo" alt="Logo Laboratorium Terpadu"
+                     style="display:none"
+                     onload="this.style.display='block';document.getElementById('labLogoFallback').style.display='none'"
+                     onerror="this.style.display='none';document.getElementById('labLogoFallback').style.display='inline-flex'">
+            </div>
+
+            <div>
+                <h3>Laboratorium Terpadu</h3>
+                <small>Universitas Dr. Soekardjo Banyuwangi</small>
+            </div>
+
+        </div>
+
+        <nav>
+            <a href="#beranda">Beranda</a>
+            <a href="#profil">Profil</a>
+            <a href="#laboratorium">Laboratorium</a>
+            <a href="#galeri">Galeri</a>
+            <a href="#kontak">Kontak</a>
+            <a href="admin.html" class="admin-nav">🔐 Login Admin</a>
+        </nav>
+
+    </div>
+
 </header>
 
-<main class="wrap">
 
-<section id="loginBox" class="card login">
-  <h2>Login Admin</h2>
-  <div class="field"><label>Email</label><input id="email" type="email" autocomplete="username"></div>
-  <div class="field"><label>Password</label><input id="password" type="password" autocomplete="current-password"></div>
-  <button id="loginBtn" class="primary" type="button">Login</button>
-  <div id="loginStatus" class="status"></div>
+<!-- HERO -->
+
+<section class="hero" id="beranda">
+
+    <div class="hero-content">
+
+        <div class="hero-label">
+            UNIVERSITAS DR. SOEKARDJO BANYUWANGI
+        </div>
+
+        <h1>
+            Laboratorium Terpadu
+        </h1>
+
+        <p>
+            Pusat pembelajaran, praktikum, simulasi, dan pengembangan
+            keterampilan mahasiswa dalam mendukung pendidikan yang
+            berkualitas dan berbasis kompetensi.
+        </p>
+
+        <a href="#laboratorium" class="btn">
+            Jelajahi Laboratorium
+        </a>
+
+        <a href="#galeri" class="btn btn-outline">
+            Lihat Galeri
+        </a>
+
+    </div>
+
 </section>
 
-<section id="adminBox" class="hidden">
 
-  <div class="admin-menu">
-    <button id="menuAdd" class="active" type="button">➕ Tambah Foto</button>
-    <button id="menuManage" type="button">🖼️ Kelola Foto</button>
-    <button id="menuGroup" type="button">🗂️ Kelompok / Album</button>
-    <button id="menuSitePhotos" type="button">🖼️ Foto Tampilan Website</button>
-    <button id="menuContent" type="button">📝 Konten Website</button>
-    <button id="menuProfile" type="button">🏢 Profil Lab & Logo</button>
-    <a href="index.html" class="website-link">← Website Utama</a>
-  </div>
+<!-- PROFIL -->
 
-  <div id="addPanel" class="panel">
-    <div class="card">
-      <h2>Tambah Foto Galeri</h2>
-      <div class="grid">
-        <div class="field"><label>Judul</label><input id="judul" placeholder="Contoh: Praktikum RJP"></div>
-        <div class="field">
-          <label>Kelompok / Kategori</label>
-          <select id="kategoriSelect"><option value="">Tanpa kategori</option></select>
-          <div class="small">Pilih kategori yang sudah ada, atau isi kategori baru di bawah.</div>
+<section class="about" id="profil">
+
+    <div class="container">
+
+        <div class="about-grid">
+
+            <div class="about-image">
+
+                <img
+                src="https://plottbyxuuqzlppytkqj.supabase.co/storage/v1/object/public/galery/website/profil"
+                alt="Laboratorium">
+
+            </div>
+
+            <div class="about-text">
+
+                <span style="color:#059669;font-weight:bold;">
+                    TENTANG KAMI
+                </span>
+
+                <h2>
+                    Laboratorium Terpadu
+                </h2>
+
+                <p>
+                    Laboratorium Terpadu Universitas Dr. Soekardjo
+                    Banyuwangi merupakan fasilitas penunjang pendidikan
+                    yang digunakan dalam kegiatan pembelajaran,
+                    praktikum, demonstrasi, simulasi, dan pelatihan
+                    keterampilan mahasiswa.
+                </p>
+
+                <p>
+                    Laboratorium dikembangkan untuk mendukung proses
+                    pembelajaran yang aman, sistematis, inovatif, dan
+                    berorientasi pada pencapaian kompetensi mahasiswa.
+                </p>
+
+            </div>
+
         </div>
-        <div class="field">
-          <label>Kategori Baru (opsional)</label>
-          <input id="kategoriBaru" placeholder="Contoh: Laboratorium KMB">
-        </div>
-        <div class="field full"><label>Deskripsi</label><textarea id="deskripsi"></textarea></div>
-        <div class="field full"><label>Pilih Foto</label><input id="foto" type="file" accept="image/*"><div class="small">Maksimal 10 MB.</div></div>
-      </div>
-      <div class="actions">
-        <button id="uploadBtn" class="primary" type="button">Upload & Simpan</button>
-        <button id="resetBtn" class="secondary" type="button">Kosongkan</button>
-      </div>
-      <div id="uploadStatus" class="status"></div>
+
     </div>
-  </div>
-
-  <div id="managePanel" class="panel hidden-panel">
-    <div class="card">
-      <div class="toolbar">
-        <div>
-          <h2 style="margin-bottom:4px">Kelola Foto</h2>
-          <div class="small">Cari, filter, edit, atau hapus foto.</div>
-        </div>
-        <button id="refreshBtn" class="secondary" type="button">Refresh</button>
-      </div>
-
-      <div class="filters">
-        <input id="searchInput" placeholder="Cari judul atau deskripsi...">
-        <select id="filterCategory"><option value="">Semua kategori</option></select>
-      </div>
-
-      <div id="gallery" class="gallery"></div>
-      <div id="empty" class="small">Belum ada data galeri.</div>
-    </div>
-  </div>
-
-  <div id="groupPanel" class="panel hidden-panel">
-    <div class="card">
-      <h2>Kelompok / Album Foto</h2>
-      <div class="small">Kategori dipakai sebagai kelompok/album galeri.</div>
-      <div id="categoryGrid" class="category-grid"></div>
-    </div>
-
-    <div class="card">
-      <h2>Ganti Nama Kelompok</h2>
-      <div class="grid">
-        <div class="field">
-          <label>Kelompok Lama</label>
-          <select id="renameOld"><option value="">Pilih kategori</option></select>
-        </div>
-        <div class="field">
-          <label>Nama Kelompok Baru</label>
-          <input id="renameNew" placeholder="Nama kategori baru">
-        </div>
-      </div>
-      <div class="actions">
-        <button id="renameCategoryBtn" class="primary" type="button">Ganti Nama Kelompok</button>
-      </div>
-      <div id="renameStatus" class="status"></div>
-    </div>
-
-    <div class="card">
-      <h2>Pindahkan Beberapa Foto</h2>
-      <div class="grid">
-        <div class="field">
-          <label>Pindahkan ke Kelompok</label>
-          <select id="bulkTarget"><option value="">Tanpa kategori</option></select>
-        </div>
-        <div class="field">
-          <label>Atau buat kelompok baru</label>
-          <input id="bulkNewCategory" placeholder="Nama kelompok baru">
-        </div>
-      </div>
-      <div id="bulkList" class="bulk-list"></div>
-      <div class="actions">
-        <button id="bulkMoveBtn" class="primary" type="button">Pindahkan Foto Terpilih</button>
-      </div>
-      <div id="bulkStatus" class="status"></div>
-    </div>
-  </div>
-
-
-  <div id="sitePhotosPanel" class="panel hidden-panel">
-    <div class="card">
-      <h2>Foto Tampilan Website</h2>
-      <div class="profile-note">
-        Foto di bagian ini digunakan langsung pada tampilan website utama.
-        Anda dapat mengedit judul, keterangan, dan foto Hero, Profil, serta Fasilitas.
-        Untuk mengubah teks saja, tidak perlu memilih foto baru.
-        Disarankan memakai foto landscape dengan kualitas baik dan ukuran file tidak lebih dari 10 MB.
-      </div>
-
-      <div class="site-photo-grid">
-
-        <div class="site-photo-card">
-          <h3>Foto Hero / Sampul Utama</h3>
-          <p>Foto besar pada bagian paling atas website.</p>
-          <div class="site-photo-preview">
-            <span id="heroFallback" class="site-photo-placeholder">Belum ada foto Hero dari Supabase</span>
-            <img id="heroPreview" alt="Preview Hero">
-          </div>
-          <div class="field"><label for="heroJudul">Judul Foto</label><input id="heroJudul" type="text"></div>
-          <div class="field"><label for="heroKeterangan">Keterangan Foto</label><textarea id="heroKeterangan"></textarea></div>
-          <label for="heroFile">Pilih Foto Baru (opsional)</label>
-          <input id="heroFile" type="file" accept="image/*">
-          <button class="primary site-photo-save" type="button" data-slot="hero">Simpan Perubahan</button>
-          <div id="heroStatus" class="status"></div>
-        </div>
-
-        <div class="site-photo-card">
-          <h3>Foto Profil Laboratorium</h3>
-          <p>Foto pada bagian “Tentang Kami / Profil Laboratorium”.</p>
-          <div class="site-photo-preview">
-            <span id="profilFallback" class="site-photo-placeholder">Belum ada foto Profil dari Supabase</span>
-            <img id="profilPreview" alt="Preview Profil">
-          </div>
-          <div class="field"><label for="profilJudul">Judul Foto</label><input id="profilJudul" type="text"></div>
-          <div class="field"><label for="profilKeterangan">Keterangan Foto</label><textarea id="profilKeterangan"></textarea></div>
-          <label for="profilFile">Pilih Foto Baru (opsional)</label>
-          <input id="profilFile" type="file" accept="image/*">
-          <button class="primary site-photo-save" type="button" data-slot="profil">Simpan Perubahan</button>
-          <div id="profilStatus" class="status"></div>
-        </div>
-
-        <form id="facilityHeaderForm" class="site-photo-card" style="grid-column:1/-1">
-          <h3>FASILITAS KAMI — Judul Bagian</h3>
-          <p>Atur judul besar dan teks pengantar yang tampil di website utama.</p>
-          <div class="field"><label for="facilitySectionJudul">Judul Besar</label><input id="facilitySectionJudul" required disabled></div>
-          <div class="field"><label for="facilitySectionDeskripsi">Teks Pengantar</label><textarea id="facilitySectionDeskripsi" disabled></textarea></div>
-          <button id="saveFacilityHeaderBtn" class="primary" type="submit" disabled>Simpan Judul Bagian</button>
-          <div id="facilityHeaderStatus" class="status" role="status" aria-live="polite"></div>
-        </form>
-
-        <div class="site-photo-card">
-          <h3>Foto Fasilitas 1</h3>
-          <p>Foto kartu fasilitas pertama.</p>
-          <div class="site-photo-preview">
-            <span id="fasilitas1Fallback" class="site-photo-placeholder">Belum ada foto</span>
-            <img id="fasilitas1Preview" alt="Fasilitas 1">
-          </div>
-          <div class="field"><label for="fasilitas1Judul">Nama Laboratorium</label><input id="fasilitas1Judul" type="text"></div>
-          <div class="field"><label for="fasilitas1Keterangan">Keterangan Laboratorium</label><textarea id="fasilitas1Keterangan"></textarea></div>
-          <label for="fasilitas1File">Pilih Foto Baru (opsional)</label>
-          <input id="fasilitas1File" type="file" accept="image/*">
-          <button class="primary site-photo-save" type="button" data-slot="fasilitas1">Simpan Perubahan</button>
-          <div id="fasilitas1Status" class="status"></div>
-        </div>
-
-        <div class="site-photo-card">
-          <h3>Foto Fasilitas 2</h3>
-          <p>Foto kartu fasilitas kedua.</p>
-          <div class="site-photo-preview">
-            <span id="fasilitas2Fallback" class="site-photo-placeholder">Belum ada foto</span>
-            <img id="fasilitas2Preview" alt="Fasilitas 2">
-          </div>
-          <div class="field"><label for="fasilitas2Judul">Nama Laboratorium</label><input id="fasilitas2Judul" type="text"></div>
-          <div class="field"><label for="fasilitas2Keterangan">Keterangan Laboratorium</label><textarea id="fasilitas2Keterangan"></textarea></div>
-          <label for="fasilitas2File">Pilih Foto Baru (opsional)</label>
-          <input id="fasilitas2File" type="file" accept="image/*">
-          <button class="primary site-photo-save" type="button" data-slot="fasilitas2">Simpan Perubahan</button>
-          <div id="fasilitas2Status" class="status"></div>
-        </div>
-
-        <div class="site-photo-card">
-          <h3>Foto Fasilitas 3</h3>
-          <p>Foto kartu fasilitas ketiga.</p>
-          <div class="site-photo-preview">
-            <span id="fasilitas3Fallback" class="site-photo-placeholder">Belum ada foto</span>
-            <img id="fasilitas3Preview" alt="Fasilitas 3">
-          </div>
-          <div class="field"><label for="fasilitas3Judul">Nama Laboratorium</label><input id="fasilitas3Judul" type="text"></div>
-          <div class="field"><label for="fasilitas3Keterangan">Keterangan Laboratorium</label><textarea id="fasilitas3Keterangan"></textarea></div>
-          <label for="fasilitas3File">Pilih Foto Baru (opsional)</label>
-          <input id="fasilitas3File" type="file" accept="image/*">
-          <button class="primary site-photo-save" type="button" data-slot="fasilitas3">Simpan Perubahan</button>
-          <div id="fasilitas3Status" class="status"></div>
-        </div>
-
-        <div class="site-photo-card">
-          <h3>Foto Fasilitas 4</h3>
-          <p>Foto kartu fasilitas keempat.</p>
-          <div class="site-photo-preview">
-            <span id="fasilitas4Fallback" class="site-photo-placeholder">Belum ada foto</span>
-            <img id="fasilitas4Preview" alt="Fasilitas 4">
-          </div>
-          <div class="field"><label for="fasilitas4Judul">Nama Laboratorium</label><input id="fasilitas4Judul" type="text"></div>
-          <div class="field"><label for="fasilitas4Keterangan">Keterangan Laboratorium</label><textarea id="fasilitas4Keterangan"></textarea></div>
-          <label for="fasilitas4File">Pilih Foto Baru (opsional)</label>
-          <input id="fasilitas4File" type="file" accept="image/*">
-          <button class="primary site-photo-save" type="button" data-slot="fasilitas4">Simpan Perubahan</button>
-          <div id="fasilitas4Status" class="status"></div>
-        </div>
-
-        <div class="site-photo-card">
-          <h3>Foto Fasilitas 5</h3>
-          <p>Foto kartu fasilitas kelima.</p>
-          <div class="site-photo-preview">
-            <span id="fasilitas5Fallback" class="site-photo-placeholder">Belum ada foto</span>
-            <img id="fasilitas5Preview" alt="Fasilitas 5">
-          </div>
-          <div class="field"><label for="fasilitas5Judul">Nama Laboratorium</label><input id="fasilitas5Judul" type="text"></div>
-          <div class="field"><label for="fasilitas5Keterangan">Keterangan Laboratorium</label><textarea id="fasilitas5Keterangan"></textarea></div>
-          <label for="fasilitas5File">Pilih Foto Baru (opsional)</label>
-          <input id="fasilitas5File" type="file" accept="image/*">
-          <button class="primary site-photo-save" type="button" data-slot="fasilitas5">Simpan Perubahan</button>
-          <div id="fasilitas5Status" class="status"></div>
-        </div>
-
-        <div class="site-photo-card">
-          <h3>Foto Fasilitas 6</h3>
-          <p>Foto kartu fasilitas keenam.</p>
-          <div class="site-photo-preview">
-            <span id="fasilitas6Fallback" class="site-photo-placeholder">Belum ada foto</span>
-            <img id="fasilitas6Preview" alt="Fasilitas 6">
-          </div>
-          <div class="field"><label for="fasilitas6Judul">Nama Laboratorium</label><input id="fasilitas6Judul" type="text"></div>
-          <div class="field"><label for="fasilitas6Keterangan">Keterangan Laboratorium</label><textarea id="fasilitas6Keterangan"></textarea></div>
-          <label for="fasilitas6File">Pilih Foto Baru (opsional)</label>
-          <input id="fasilitas6File" type="file" accept="image/*">
-          <button class="primary site-photo-save" type="button" data-slot="fasilitas6">Simpan Perubahan</button>
-          <div id="fasilitas6Status" class="status"></div>
-        </div>
-
-      </div>
-    </div>
-<div class="card" id="dynamicFacilityManager">
-<h2><button id="openDynamicFacilityBtn" type="button" aria-controls="dynamicFacilityForm" style="font:inherit;color:inherit;background:transparent;padding:0;text-align:left">Fasilitas Website Dinamis</button></h2>
-<div class="profile-note">
-Isi formulir Nama Laboratorium, Keterangan, dan Foto di bawah, lalu klik Simpan Fasilitas. Fasilitas tambahan akan tampil setelah enam laboratorium utama pada bagian Fasilitas Kami.
-</div>
-
-
-
-<button id="refreshDynamicFacilityBtn" class="secondary" type="button">Muat Ulang</button>
-<div id="dynamicFacilityList" class="gallery"></div>
-<div class="actions"><button id="addDynamicFacilityBtn" class="primary" type="button">
-+ Tambahkan Fasilitas Baru
-</button></div>
-<form id="dynamicFacilityForm" style="margin-top:18px;border-top:1px solid var(--border);padding-top:18px" aria-labelledby="dynamicFormTitle">
-  <h3 id="dynamicFormTitle">Tambah Fasilitas</h3>
-  <div class="field"><label for="dynamicJudul">Nama Laboratorium</label><input id="dynamicJudul" required></div>
-  <div class="field"><label for="dynamicDeskripsi">Deskripsi / Keterangan</label><textarea id="dynamicDeskripsi"></textarea></div>
-  <div class="field">
-    <label for="dynamicPhotoFile">Foto Laboratorium (maksimal 10 MB)</label>
-    <img id="dynamicPhotoPreview" alt="Preview foto laboratorium" style="display:none;width:100%;max-height:240px;object-fit:cover;border-radius:12px">
-    <input id="dynamicPhotoFile" type="file" accept="image/*">
-    <div class="small">Wajib untuk fasilitas baru. Saat mengedit, kosongkan untuk mempertahankan foto.</div>
-  </div>
-  <div class="actions">
-    <button id="saveDynamicFacilityBtn" class="primary" type="submit">Simpan Fasilitas</button>
-    <button id="cancelDynamicFacilityBtn" class="secondary" type="button">Batal</button>
-  </div>
-</form>
-<div id="dynamicStatus" class="status" role="status" aria-live="polite"></div>
-
-</div>
-  </div>
-
-
-  
-<div id="contentPanel" class="panel hidden-panel">
-    <div class="card">
-      <h2>📝 Konten Website</h2>
-      <div class="profile-note">Kelola judul dan deskripsi konten website tanpa mengubah kode.</div>
-      <div class="grid">
-        <div class="field">
-          <label>Bagian</label>
-          <select id="contentBagian">
-            <option value="fasilitas">Fasilitas</option>
-            <option value="hero">Hero</option>
-            <option value="profil">Profil</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Tipe</label>
-          <input id="contentTipe" value="card">
-        </div>
-        <div class="field full"><label>Judul</label><input id="contentJudul"></div>
-        <div class="field full"><label>Deskripsi</label><textarea id="contentDeskripsi"></textarea></div>
-      </div>
-      <div class="actions"><button id="saveContentBtn" class="primary" type="button">Simpan Konten</button></div>
-      <div id="contentStatus" class="status"></div>
-      <hr>
-      <div id="contentList"></div>
-    </div>
-  </div>
-
-  <div id="profilePanel" class="panel hidden-panel">
-    <div class="card">
-      <h2>Profil Lab & Logo</h2>
-      <div class="profile-note">
-        Logo yang disimpan di sini akan otomatis digunakan pada navbar website utama.
-      </div>
-      <div class="logo-grid">
-        <div class="logo-preview">
-          <span id="logoFallback" class="logo-fallback">LAB</span>
-          <img id="logoPreview" alt="Logo Laboratorium">
-        </div>
-        <div>
-          <div class="field">
-            <label>Pilih Logo Baru</label>
-            <input id="logoFile" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml">
-            <div class="small">PNG transparan/WebP disarankan. Maksimal 5 MB.</div>
-          </div>
-          <div class="actions">
-            <button id="saveLogoBtn" class="primary" type="button">Simpan / Perbarui Logo</button>
-          </div>
-          <div id="logoStatus" class="status"></div>
-        </div>
-      </div>
-    </div>
-  </div>
 
 </section>
-</main>
 
-<dialog id="editDialog">
-<div class="dialog-body">
-  <h2>Edit Foto</h2>
-  <input id="editId" type="hidden">
-  <div class="grid">
-    <div class="field"><label>Judul</label><input id="editJudul"></div>
-    <div class="field"><label>Kategori</label><input id="editKategori"></div>
-    <div class="field full"><label>Deskripsi</label><textarea id="editDeskripsi"></textarea></div>
-  </div>
-  <div class="actions">
-    <button id="saveEditBtn" class="primary" type="button">Simpan</button>
-    <button id="cancelEditBtn" class="secondary" type="button">Batal</button>
-  </div>
-  <div id="editStatus" class="status"></div>
+
+<!-- LABORATORIUM -->
+
+<section id="laboratorium">
+
+    <div class="container">
+
+        <div class="section-title">
+
+            <span>FASILITAS KAMI</span>
+
+            <h2>Jelajahi Laboratorium</h2>
+
+            <p>
+                Mengenal ruang laboratorium dan fasilitas pembelajaran
+                yang tersedia di Universitas Dr. Soekardjo Banyuwangi.
+            </p>
+
+        </div>
+
+
+        <div class="lab-grid">
+
+            <div class="lab-card">
+
+                <img
+                src="https://plottbyxuuqzlppytkqj.supabase.co/storage/v1/object/public/galery/website/fasilitas-1">
+
+                <div class="lab-content">
+
+                    <h3>Laboratorium Keperawatan Dasar</h3>
+
+                    <p>
+                        Mendukung pembelajaran keterampilan dasar
+                        keperawatan dan pemenuhan kebutuhan dasar pasien.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="lab-card">
+
+                <img
+                src="https://plottbyxuuqzlppytkqj.supabase.co/storage/v1/object/public/galery/website/fasilitas-2">
+
+                <div class="lab-content">
+
+                    <h3>Laboratorium Medikal Bedah</h3>
+
+                    <p>
+                        Fasilitas simulasi dan praktikum keperawatan
+                        pasien dewasa dengan berbagai gangguan sistem.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="lab-card">
+
+                <img
+                src="https://plottbyxuuqzlppytkqj.supabase.co/storage/v1/object/public/galery/website/fasilitas-3">
+
+                <div class="lab-content">
+
+                    <h3>Laboratorium Gawat Darurat</h3>
+
+                    <p>
+                        Mendukung simulasi kegawatdaruratan, resusitasi,
+                        triase, dan berbagai keterampilan emergency.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="lab-card">
+
+                <img
+                src="https://plottbyxuuqzlppytkqj.supabase.co/storage/v1/object/public/galery/website/fasilitas-4">
+
+                <div class="lab-content">
+
+                    <h3>Laboratorium Maternitas</h3>
+
+                    <p>
+                        Digunakan untuk pembelajaran keterampilan
+                        keperawatan maternitas dan kesehatan reproduksi.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="lab-card">
+
+                <img
+                src="https://plottbyxuuqzlppytkqj.supabase.co/storage/v1/object/public/galery/website/fasilitas-5">
+
+                <div class="lab-content">
+
+                    <h3>Laboratorium Keperawatan Anak</h3>
+
+                    <p>
+                        Fasilitas pembelajaran dan simulasi asuhan
+                        keperawatan pada bayi dan anak.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="lab-card">
+
+                <img
+                src="https://plottbyxuuqzlppytkqj.supabase.co/storage/v1/object/public/galery/website/fasilitas-6">
+
+                <div class="lab-content">
+
+                    <h3>Laboratorium OSCE & Skill Station</h3>
+
+                    <p>
+                        Mendukung pelaksanaan latihan keterampilan dan
+                        evaluasi kompetensi mahasiswa secara terstruktur.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- FASILITAS -->
+
+<section class="features">
+
+    <div class="container">
+
+        <div class="section-title">
+
+            <span style="color:#a7f3d0">
+                DUKUNGAN PEMBELAJARAN
+            </span>
+
+            <h2>Fasilitas Laboratorium</h2>
+
+            <p>
+                Fasilitas untuk mendukung proses pembelajaran,
+                simulasi, dan peningkatan keterampilan mahasiswa.
+            </p>
+
+        </div>
+
+
+        <div class="feature-grid">
+
+            <div class="feature-card">
+
+                <div class="feature-icon">🏥</div>
+
+                <h3>Ruang Praktikum</h3>
+
+                <p>
+                    Ruang pembelajaran yang mendukung kegiatan
+                    praktik dan simulasi.
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">🩺</div>
+
+                <h3>Peralatan Kesehatan</h3>
+
+                <p>
+                    Berbagai alat kesehatan sebagai media
+                    pembelajaran mahasiswa.
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">👨‍⚕️</div>
+
+                <h3>Manekin Simulasi</h3>
+
+                <p>
+                    Media simulasi untuk latihan berbagai
+                    keterampilan klinik.
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">🎓</div>
+
+                <h3>Skill Station</h3>
+
+                <p>
+                    Mendukung proses latihan dan evaluasi
+                    keterampilan mahasiswa.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- GALERI -->
+
+<section class="gallery" id="galeri">
+
+    <div class="container">
+
+        <div class="section-title">
+
+            <span>DOKUMENTASI</span>
+
+            <h2>Galeri Laboratorium</h2>
+
+            <p>
+                Dokumentasi fasilitas dan berbagai kegiatan
+                Laboratorium Terpadu.
+            </p>
+
+        </div>
+
+        <div id="galleryStatus" class="gallery-status">
+            Memuat galeri terbaru...
+        </div>
+
+        <div class="gallery-grid" id="galleryGrid">
+            <img src="https://plottbyxuuqzlppytkqj.supabase.co/storage/v1/object/public/galery/website/profil" alt="Dokumentasi Laboratorium 2" loading="lazy">
+            <img src="https://plottbyxuuqzlppytkqj.supabase.co/storage/v1/object/public/galery/website/fasilitas-1" alt="Dokumentasi Laboratorium 3" loading="lazy">
+            <img src="https://plottbyxuuqzlppytkqj.supabase.co/storage/v1/object/public/galery/website/fasilitas-2" alt="Dokumentasi Laboratorium 4" loading="lazy">
+            <img src="https://plottbyxuuqzlppytkqj.supabase.co/storage/v1/object/public/galery/website/fasilitas-3" alt="Dokumentasi Laboratorium 5" loading="lazy">
+            <img src="https://plottbyxuuqzlppytkqj.supabase.co/storage/v1/object/public/galery/website/fasilitas-4" alt="Dokumentasi Laboratorium 6" loading="lazy">
+            <img src="https://plottbyxuuqzlppytkqj.supabase.co/storage/v1/object/public/galery/website/fasilitas-5" alt="Dokumentasi Laboratorium 7" loading="lazy">
+            <img src="https://plottbyxuuqzlppytkqj.supabase.co/storage/v1/object/public/galery/website/fasilitas-6" alt="Dokumentasi Laboratorium 8" loading="lazy">
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- KONTAK -->
+
+<section id="kontak">
+
+    <div class="container">
+
+        <div class="contact-box">
+
+            <h2>
+                Laboratorium Terpadu
+            </h2>
+
+            <p>
+                Universitas Dr. Soekardjo Banyuwangi
+            </p>
+
+            <br>
+
+            <p>
+                Informasi mengenai alamat, kontak, email, dan
+                jadwal pelayanan laboratorium akan ditampilkan
+                pada bagian ini.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<footer>
+
+    <h3>
+        Laboratorium Terpadu
+    </h3>
+
+    <p>
+        Universitas Dr. Soekardjo Banyuwangi
+    </p>
+
+    <a class="footer-admin-link" href="admin.html">Login Admin Galeri</a>
+
+    <div class="copyright">
+
+        © 2026 Laboratorium Terpadu
+        Universitas Dr. Soekardjo Banyuwangi.
+        All Rights Reserved.
+
+    </div>
+
+</footer>
+
+
+
+<div id="lightbox" style="
+    display:none; position:fixed; inset:0; z-index:9999;
+    background:rgba(0,0,0,.9); align-items:center; justify-content:center;
+    padding:20px;">
+    <button id="lightboxClose" style="
+        position:absolute; top:20px; right:25px; border:0;
+        background:rgba(255,255,255,.15); color:#fff;
+        width:46px; height:46px; border-radius:50%;
+        font-size:28px; cursor:pointer;">×</button>
+    <img id="lightboxImg" src="" alt="Foto Laboratorium"
+         style="max-width:94vw; max-height:88vh; object-fit:contain; border-radius:12px;">
 </div>
-</dialog>
 
 <script>
-const BASE_URL = 'https://plottbyxuuqzlppytkqj.supabase.co';
-const API_KEY = 'sb_publishable_rI0z0kyaLhMP3x4_lhL79w_M5oHEGWB';
-const ADMIN_UID = '5a12f804-2471-47d5-8605-ae8cd7c99b10';
-const LOGO_PATH = "branding/logo-lab";
+const SUPABASE_URL = "https://plottbyxuuqzlppytkqj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_rI0z0kyaLhMP3x4_lhL79w_M5oHEGWB";
 
-let accessToken = sessionStorage.getItem("lab_access_token") || "";
-let currentUserId = sessionStorage.getItem("lab_user_id") || "";
-let galleryData = [];
-
-const $ = id => document.getElementById(id);
-
-function setStatus(id,msg,type=""){
-  const el=$(id); el.textContent=msg; el.className="status show "+type;
-}
-function clearStatus(id){ const el=$(id); el.textContent=""; el.className="status"; }
-function showLogin(){
-  $("loginBox").classList.remove("hidden");
-  $("adminBox").classList.add("hidden");
-  $("logoutBtn").classList.add("hidden");
-}
-function showAdmin(){
-  $("loginBox").classList.add("hidden");
-  $("adminBox").classList.remove("hidden");
-  $("logoutBtn").classList.remove("hidden");
-}
-function openPanel(name){
-  const map={add:"addPanel",manage:"managePanel",group:"groupPanel",sitePhotos:"sitePhotosPanel",content:"contentPanel",profile:"profilePanel"};
-  Object.values(map).forEach(id => $(id).classList.add("hidden-panel"));
-  Object.keys(map).forEach(key => $("menu"+key.charAt(0).toUpperCase()+key.slice(1))?.classList.remove("active"));
-  $(map[name]).classList.remove("hidden-panel");
-
-  if(name==="add") $("menuAdd").classList.add("active");
-  if(name==="manage") $("menuManage").classList.add("active");
-  if(name==="group") $("menuGroup").classList.add("active");
-  if(name==="sitePhotos") $("menuSitePhotos").classList.add("active");
-  if(name==="content") $("menuContent").classList.add("active");
-  if(name==="profile") $("menuProfile").classList.add("active");
-
-  if(name==="manage") renderManage();
-  if(name==="group") renderGroups();
-  if(name==="sitePhotos") loadSitePhotoPreviews();
-  if(name==="content") loadContent();
-  if(name==="profile") loadLogoPreview();
+const labLogo = document.getElementById("labLogo");
+if (labLogo) {
+    labLogo.src =
+        SUPABASE_URL +
+        "/storage/v1/object/public/galery/branding/logo-lab?v=" +
+        Date.now();
 }
 
-async function apiFetch(path,options={},auth=true){
-  const headers=Object.assign({"apikey":API_KEY},options.headers||{});
-  if(auth && accessToken) headers["Authorization"]="Bearer "+accessToken;
-  return fetch(BASE_URL+path,Object.assign({},options,{headers}));
+const galleryGrid = document.getElementById("galleryGrid");
+const galleryStatus = document.getElementById("galleryStatus");
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
 }
 
+async function loadGalleryFromSupabase() {
+    try {
+        const response = await fetch(
+            SUPABASE_URL + "/rest/v1/galery?select=*",
+            {
+                headers: {
+                    "apikey": SUPABASE_KEY
+                }
+            }
+        );
 
+        if (!response.ok) {
+            throw new Error(await response.text());
+        }
 
-async function loadContent(){
-  const res=await apiFetch('/rest/v1/website_content?select=*&order=id.asc');
-  const data=await res.json();
-  $("contentList").innerHTML=data.map(x=>`
-    <div class="card" style="margin-top:10px">
-      <b>${x.judul||''}</b><br>
-      <small>${x.bagian||''} - ${x.tipe||''}</small>
-      <p>${x.deskripsi||''}</p>
-    </div>`).join('');
-}
+        let items = await response.json();
 
-async function saveContent(){
-  const body={
-    bagian:$("contentBagian").value,
-    tipe:$("contentTipe").value,
-    judul:$("contentJudul").value,
-    deskripsi:$("contentDeskripsi").value
-  };
-  const res=await apiFetch('/rest/v1/website_content',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Prefer':'return=minimal'},
-    body:JSON.stringify(body)
-  });
-  if(res.ok){
-    setStatus('contentStatus','Konten berhasil disimpan.','ok');
-    loadContent();
-  }else{
-    setStatus('contentStatus','Gagal: '+await res.text(),'err');
-  }
-}
+        if (!Array.isArray(items) || items.length === 0) {
+            galleryStatus.textContent = "Menampilkan dokumentasi galeri yang tersedia.";
+            return;
+        }
 
-$("saveContentBtn")?.addEventListener('click',saveContent);
+        // Foto terbaru lebih dulu bila created_at tersedia.
+        items.sort((a, b) => {
+            const ta = a.created_at ? new Date(a.created_at).getTime() : 0;
+            const tb = b.created_at ? new Date(b.created_at).getTime() : 0;
+            return tb - ta;
+        });
 
-async function login(){
-  clearStatus("loginStatus");
-  const email=$("email").value.trim();
-  const password=$("password").value;
-  if(!email||!password) return setStatus("loginStatus","Email dan password wajib diisi.","err");
+        galleryGrid.innerHTML = "";
 
-  $("loginBtn").disabled=true; $("loginBtn").textContent="Memproses...";
-  try{
-    const res=await fetch(BASE_URL+"/auth/v1/token?grant_type=password",{
-      method:"POST",
-      headers:{"apikey":API_KEY,"Content-Type":"application/json"},
-      body:JSON.stringify({email,password})
-    });
-    const raw=await res.text(); let data={};
-    try{data=JSON.parse(raw)}catch(_e){}
-    if(!res.ok) throw new Error(data.error_description||data.msg||data.message||raw||"Login gagal");
-    if(!data.user || data.user.id!==ADMIN_UID) throw new Error("Akun ini tidak memiliki hak admin.");
+        items.forEach((item) => {
+            if (!item.url_foto) return;
 
-    accessToken=data.access_token; currentUserId=data.user.id;
-    sessionStorage.setItem("lab_access_token",accessToken);
-    sessionStorage.setItem("lab_user_id",currentUserId);
-    showAdmin();
-    await loadGalleryData();
-    openPanel("add");
-  }catch(err){
-    setStatus("loginStatus","Login gagal: "+err.message,"err");
-  }finally{
-    $("loginBtn").disabled=false; $("loginBtn").textContent="Login";
-  }
-}
+            const card = document.createElement("article");
+            card.className = "gallery-card";
 
-$("loginBtn").addEventListener("click",login);
-$("password").addEventListener("keydown",e=>{if(e.key==="Enter")login()});
-$("logoutBtn").addEventListener("click",()=>{
-  accessToken=""; currentUserId="";
-  sessionStorage.removeItem("lab_access_token"); sessionStorage.removeItem("lab_user_id");
-  showLogin();
-});
+            const image = document.createElement("img");
+            image.src = item.url_foto;
+            image.alt = item.judul || "Dokumentasi Laboratorium Terpadu";
+            image.loading = "lazy";
 
-$("menuAdd").addEventListener("click",()=>openPanel("add"));
-$("menuManage").addEventListener("click",()=>openPanel("manage"));
-$("menuGroup").addEventListener("click",()=>openPanel("group"));
-$("menuSitePhotos").addEventListener("click",()=>openPanel("sitePhotos"));
-$("menuContent").addEventListener("click",()=>openPanel("content"));
-$("menuProfile").addEventListener("click",()=>openPanel("profile"));
+            const caption = document.createElement("div");
+            caption.className = "gallery-caption";
 
-function categories(){
-  return [...new Set(galleryData.map(x=>(x.kategori||"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"id"));
-}
-function refillCategorySelects(){
-  const cats=categories();
-  const configs=[
-    ["kategoriSelect","Tanpa kategori",true],
-    ["filterCategory","Semua kategori",true],
-    ["renameOld","Pilih kategori",false],
-    ["bulkTarget","Tanpa kategori",true]
-  ];
-  configs.forEach(([id,first,allowEmpty])=>{
-    const s=$(id); if(!s)return;
-    const current=s.value;
-    s.innerHTML=`<option value="">${first}</option>`;
-    cats.forEach(c=>{
-      const o=document.createElement("option"); o.value=c; o.textContent=c; s.appendChild(o);
-    });
-    if([...s.options].some(o=>o.value===current)) s.value=current;
-  });
-}
+            let captionHtml = "";
 
-async function loadGalleryData(){
-  const res=await apiFetch("/rest/v1/galery?select=*&order=created_at.desc",{method:"GET"});
-  if(!res.ok) throw new Error(await res.text());
-  galleryData=await res.json();
-  refillCategorySelects();
-}
+            if (item.kategori) {
+                captionHtml += '<span class="gallery-category">' +
+                    escapeHtml(item.kategori) + '</span>';
+            }
 
-function safeName(name){
-  const parts=name.split(".");
-  const ext=parts.length>1?"."+parts.pop().toLowerCase():"";
-  const base=parts.join(".").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,45)||"foto";
-  return Date.now()+"-"+base+ext;
-}
+            captionHtml += "<h3>" +
+                escapeHtml(item.judul || "Dokumentasi Laboratorium") +
+                "</h3>";
 
-$("resetBtn").addEventListener("click",()=>{
-  $("judul").value=""; $("kategoriSelect").value=""; $("kategoriBaru").value="";
-  $("deskripsi").value=""; $("foto").value=""; clearStatus("uploadStatus");
-});
+            if (item.deskripsi) {
+                captionHtml += "<p>" + escapeHtml(item.deskripsi) + "</p>";
+            }
 
-$("uploadBtn").addEventListener("click",async()=>{
-  clearStatus("uploadStatus");
-  const judul=$("judul").value.trim();
-  const kategoriBaru=$("kategoriBaru").value.trim();
-  const kategori=kategoriBaru || $("kategoriSelect").value.trim();
-  const deskripsi=$("deskripsi").value.trim();
-  const file=$("foto").files[0];
+            caption.innerHTML = captionHtml;
 
-  if(!judul||!file) return setStatus("uploadStatus","Judul dan foto wajib diisi.","err");
-  if(file.size>10*1024*1024) return setStatus("uploadStatus","Ukuran foto melebihi 10 MB.","err");
+            card.appendChild(image);
+            card.appendChild(caption);
+            galleryGrid.appendChild(card);
+        });
 
-  $("uploadBtn").disabled=true; $("uploadBtn").textContent="Mengupload...";
-  const fileName=safeName(file.name);
+        galleryStatus.textContent =
+            items.length + " dokumentasi terbaru dari Galeri Laboratorium Terpadu.";
 
-  try{
-    const up=await apiFetch("/storage/v1/object/galery/"+encodeURIComponent(fileName),{
-      method:"POST",
-      headers:{"Content-Type":file.type||"application/octet-stream","x-upsert":"false"},
-      body:file
-    });
-    if(!up.ok) throw new Error("Upload gagal: "+await up.text());
-
-    const publicUrl=BASE_URL+"/storage/v1/object/public/galery/"+encodeURIComponent(fileName);
-    const db=await apiFetch("/rest/v1/galery",{
-      method:"POST",
-      headers:{"Content-Type":"application/json","Prefer":"return=minimal"},
-      body:JSON.stringify({judul,kategori,deskripsi,url_foto:publicUrl,nama_file:fileName})
-    });
-    if(!db.ok){
-      await apiFetch("/storage/v1/object/galery/"+encodeURIComponent(fileName),{method:"DELETE"});
-      throw new Error("Data gagal disimpan: "+await db.text());
+    } catch (error) {
+        console.error("Galeri Supabase:", error);
+        galleryStatus.textContent =
+            "Galeri online sedang tidak dapat dimuat. Menampilkan dokumentasi tersimpan.";
+        // Foto Picture1–Picture43 tetap menjadi fallback karena tidak dihapus.
     }
+}
 
-    $("judul").value=""; $("kategoriSelect").value=""; $("kategoriBaru").value="";
-    $("deskripsi").value=""; $("foto").value="";
-    await loadGalleryData();
-    setStatus("uploadStatus","Foto berhasil ditambahkan.","ok");
-  }catch(err){
-    setStatus("uploadStatus",err.message,"err");
-  }finally{
-    $("uploadBtn").disabled=false; $("uploadBtn").textContent="Upload & Simpan";
-  }
+/* LIGHTBOX - bekerja untuk foto lama maupun foto Supabase */
+galleryGrid.addEventListener("click", function(event) {
+    const img = event.target.closest("img");
+    if (!img) return;
+
+    document.getElementById("lightboxImg").src = img.src;
+    document.getElementById("lightboxImg").alt = img.alt || "Foto Laboratorium";
+    document.getElementById("lightbox").style.display = "flex";
+    document.body.style.overflow = "hidden";
 });
 
-function esc(v){
-  return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+function closeLightbox() {
+    document.getElementById("lightbox").style.display = "none";
+    document.body.style.overflow = "";
 }
 
-function renderManage(){
-  refillCategorySelects();
-  const q=$("searchInput").value.trim().toLowerCase();
-  const cat=$("filterCategory").value;
-  const data=galleryData.filter(item=>{
-    const matchesText=!q || (item.judul||"").toLowerCase().includes(q) || (item.deskripsi||"").toLowerCase().includes(q);
-    const matchesCat=!cat || (item.kategori||"")===cat;
-    return matchesText && matchesCat;
-  });
+document.getElementById("lightboxClose").addEventListener("click", closeLightbox);
 
-  $("gallery").innerHTML="";
-  if(!data.length){
-    $("empty").classList.remove("hidden"); $("empty").textContent="Tidak ada foto yang sesuai.";
-    return;
-  }
-  $("empty").classList.add("hidden");
-
-  data.forEach(item=>{
-    const card=document.createElement("article"); card.className="item";
-    card.innerHTML=`
-      <img src="${esc(item.url_foto||"")}" alt="${esc(item.judul||"Foto")}">
-      <div class="item-body">
-        ${item.kategori?`<span class="badge">${esc(item.kategori)}</span>`:""}
-        <h3>${esc(item.judul||"Tanpa judul")}</h3>
-        <div class="desc">${esc(item.deskripsi||"")}</div>
-        <div class="item-actions">
-          <button type="button" class="secondary edit">Edit</button>
-          <button type="button" class="danger del">Hapus</button>
-        </div>
-      </div>`;
-    card.querySelector(".edit").addEventListener("click",()=>openEdit(item));
-    card.querySelector(".del").addEventListener("click",()=>deleteItem(item));
-    $("gallery").appendChild(card);
-  });
-}
-
-$("searchInput").addEventListener("input",renderManage);
-$("filterCategory").addEventListener("change",renderManage);
-$("refreshBtn").addEventListener("click",async()=>{await loadGalleryData(); renderManage();});
-
-function openEdit(item){
-  $("editId").value=item.id; $("editJudul").value=item.judul||"";
-  $("editKategori").value=item.kategori||""; $("editDeskripsi").value=item.deskripsi||"";
-  clearStatus("editStatus"); $("editDialog").showModal();
-}
-$("cancelEditBtn").addEventListener("click",()=>$("editDialog").close());
-
-$("saveEditBtn").addEventListener("click",async()=>{
-  clearStatus("editStatus");
-  const id=$("editId").value;
-  const judul=$("editJudul").value.trim();
-  const kategori=$("editKategori").value.trim();
-  const deskripsi=$("editDeskripsi").value.trim();
-  if(!judul) return setStatus("editStatus","Judul tidak boleh kosong.","err");
-
-  try{
-    const res=await apiFetch("/rest/v1/galery?id=eq."+encodeURIComponent(id),{
-      method:"PATCH",
-      headers:{"Content-Type":"application/json","Prefer":"return=minimal"},
-      body:JSON.stringify({judul,kategori,deskripsi})
-    });
-    if(!res.ok) throw new Error(await res.text());
-    await loadGalleryData();
-    setStatus("editStatus","Perubahan berhasil disimpan.","ok");
-    setTimeout(()=>{$("editDialog").close();renderManage()},500);
-  }catch(err){setStatus("editStatus","Gagal menyimpan: "+err.message,"err")}
+document.getElementById("lightbox").addEventListener("click", function(event) {
+    if (event.target === this) closeLightbox();
 });
 
-async function deleteItem(item){
-  if(!confirm('Hapus "'+(item.judul||"foto ini")+'"?')) return;
-  try{
-    if(item.nama_file){
-      const s=await apiFetch("/storage/v1/object/galery/"+encodeURIComponent(item.nama_file),{method:"DELETE"});
-      if(!s.ok) throw new Error("File gagal dihapus: "+await s.text());
-    }
-    const d=await apiFetch("/rest/v1/galery?id=eq."+encodeURIComponent(item.id),{method:"DELETE",headers:{"Prefer":"return=minimal"}});
-    if(!d.ok) throw new Error("Data gagal dihapus: "+await d.text());
-    await loadGalleryData(); renderManage();
-  }catch(err){alert(err.message)}
-}
-
-function renderGroups(){
-  refillCategorySelects();
-  const counts={};
-  galleryData.forEach(x=>{const c=(x.kategori||"Tanpa kategori").trim()||"Tanpa kategori"; counts[c]=(counts[c]||0)+1});
-  $("categoryGrid").innerHTML="";
-  Object.keys(counts).sort((a,b)=>a.localeCompare(b,"id")).forEach(c=>{
-    const el=document.createElement("div"); el.className="category-card";
-    el.innerHTML=`<strong>${esc(c)}</strong><span>${counts[c]} foto</span>`;
-    $("categoryGrid").appendChild(el);
-  });
-
-  $("bulkList").innerHTML="";
-  galleryData.forEach(item=>{
-    const row=document.createElement("label"); row.className="bulk-row";
-    row.innerHTML=`
-      <input type="checkbox" class="bulk-check" value="${item.id}">
-      <img src="${esc(item.url_foto||"")}" alt="">
-      <div class="bulk-meta">
-        <strong>${esc(item.judul||"Tanpa judul")}</strong>
-        <span>${esc(item.kategori||"Tanpa kategori")}</span>
-      </div>`;
-    $("bulkList").appendChild(row);
-  });
-}
-
-$("renameCategoryBtn").addEventListener("click",async()=>{
-  clearStatus("renameStatus");
-  const oldCat=$("renameOld").value.trim();
-  const newCat=$("renameNew").value.trim();
-  if(!oldCat||!newCat) return setStatus("renameStatus","Pilih kategori lama dan isi nama baru.","err");
-  try{
-    const res=await apiFetch("/rest/v1/galery?kategori=eq."+encodeURIComponent(oldCat),{
-      method:"PATCH",
-      headers:{"Content-Type":"application/json","Prefer":"return=minimal"},
-      body:JSON.stringify({kategori:newCat})
-    });
-    if(!res.ok) throw new Error(await res.text());
-    $("renameNew").value="";
-    await loadGalleryData(); renderGroups();
-    setStatus("renameStatus","Nama kelompok berhasil diubah.","ok");
-  }catch(err){setStatus("renameStatus","Gagal: "+err.message,"err")}
+document.addEventListener("keydown", function(event) {
+    if (event.key === "Escape") closeLightbox();
 });
 
-$("bulkMoveBtn").addEventListener("click",async()=>{
-  clearStatus("bulkStatus");
-  const ids=[...document.querySelectorAll(".bulk-check:checked")].map(x=>x.value);
-  const target=$("bulkNewCategory").value.trim() || $("bulkTarget").value.trim();
-  if(!ids.length) return setStatus("bulkStatus","Pilih minimal satu foto.","err");
-
-  try{
-    for(const id of ids){
-      const res=await apiFetch("/rest/v1/galery?id=eq."+encodeURIComponent(id),{
-        method:"PATCH",
-        headers:{"Content-Type":"application/json","Prefer":"return=minimal"},
-        body:JSON.stringify({kategori:target})
-      });
-      if(!res.ok) throw new Error(await res.text());
-    }
-    $("bulkNewCategory").value="";
-    await loadGalleryData(); renderGroups();
-    setStatus("bulkStatus","Foto terpilih berhasil dipindahkan.","ok");
-  }catch(err){setStatus("bulkStatus","Gagal: "+err.message,"err")}
-});
-
-
-const SITE_PHOTO_PATHS = {
-  hero: "website/hero",
-  profil: "website/profil",
-  fasilitas1: "website/fasilitas-1",
-  fasilitas2: "website/fasilitas-2",
-  fasilitas3: "website/fasilitas-3",
-  fasilitas4: "website/fasilitas-4",
-  fasilitas5: "website/fasilitas-5",
-  fasilitas6: "website/fasilitas-6"
-};
-
-const FACILITY_DEFAULTS = {"fasilitas1": {"judul": "Laboratorium Keperawatan Dasar", "keterangan": "Mendukung pembelajaran keterampilan dasar keperawatan dan pemenuhan kebutuhan dasar pasien."}, "fasilitas2": {"judul": "Laboratorium Medikal Bedah", "keterangan": "Fasilitas simulasi dan praktikum keperawatan pasien dewasa dengan berbagai gangguan sistem."}, "fasilitas3": {"judul": "Laboratorium Gawat Darurat", "keterangan": "Mendukung simulasi kegawatdaruratan, resusitasi, triase, dan berbagai keterampilan emergency."}, "fasilitas4": {"judul": "Laboratorium Maternitas", "keterangan": "Digunakan untuk pembelajaran keterampilan keperawatan maternitas dan kesehatan reproduksi."}, "fasilitas5": {"judul": "Laboratorium Keperawatan Anak", "keterangan": "Fasilitas pembelajaran dan simulasi asuhan keperawatan pada bayi dan anak."}, "fasilitas6": {"judul": "Laboratorium OSCE & Skill Station", "keterangan": "Mendukung pelaksanaan latihan keterampilan dan evaluasi kompetensi mahasiswa secara terstruktur."}};
-// Metadata memakai tabel galery yang sudah ada; alamat Storage tetap kompatibel.
-const sitePhotoBusy = new Set();
-const sitePhotoDirty = new Set();
-const sitePhotoLoaded = new Set();
-const sitePhotoLocalUrls = {};
-function sitePhotoUrl(slot){
-  return BASE_URL + "/storage/v1/object/public/galery/" + SITE_PHOTO_PATHS[slot];
-}
-function loadOneSitePhoto(slot, url){
-  const img=$(slot+"Preview"), fallback=$(slot+"Fallback");
-  img.onload=()=>{img.style.display="block";fallback.style.display="none"};
-  img.onerror=()=>{img.style.display="none";fallback.style.display="block"};
-  img.src=url || sitePhotoUrl(slot)+"?v="+Date.now();
-}
-function sitePhotoControls(slot, disabled){
-  ["Judul","Keterangan","File"].forEach(suffix=>$(slot+suffix).disabled=disabled);
-  document.querySelector('.site-photo-save[data-slot="'+slot+'"]').disabled=disabled;
-}
-function sitePhotoMatches(row,slot){
-  const path=SITE_PHOTO_PATHS[slot];
-  return row.name_foto===path || row.nama_file===path ||
-    (row.url_foto||"").split(/[?#]/)[0]===sitePhotoUrl(slot);
-}
-async function sitePhotoRow(slot,request=apiFetch){
-  const res=await request('/rest/v1/galery?select=id,judul,keterangan,name_foto,nama_file,url_foto&order=created_at.desc');
-  if(!res.ok) throw new Error("Data foto tidak dapat dibaca: "+await res.text());
-  const rows=await res.json();
-  if(!Array.isArray(rows)) throw new Error("Respons data foto tidak valid.");
-  const matches=rows.filter(row=>sitePhotoMatches(row,slot));
-  if(matches.length>1) throw new Error("Ada lebih dari satu data untuk foto ini. Data perlu diperiksa sebelum menyimpan.");
-  return matches[0] || null;
-}
-async function loadSitePhotoPreviews(){
-  if(!accessToken || currentUserId!==ADMIN_UID) return;
-  await Promise.all(Object.keys(SITE_PHOTO_PATHS).map(async slot=>{
-    if(sitePhotoBusy.has(slot) || sitePhotoDirty.has(slot)) return;
-    sitePhotoControls(slot,true);
-    clearStatus(slot+"Status");
-    loadOneSitePhoto(slot);
-    try{
-      const row=await sitePhotoRow(slot);
-      $(slot+"Judul").value=row?.judul ?? FACILITY_DEFAULTS[slot]?.judul ?? "";
-      $(slot+"Keterangan").value=row?.keterangan ?? FACILITY_DEFAULTS[slot]?.keterangan ?? "";
-      if(row?.url_foto) loadOneSitePhoto(slot,row.url_foto);
-      sitePhotoLoaded.add(slot);
-    }catch(err){
-      sitePhotoLoaded.delete(slot);
-      setStatus(slot+"Status",err.message+" Buka kembali menu ini untuk mencoba lagi.","err");
-    }finally{sitePhotoControls(slot,!sitePhotoLoaded.has(slot))}
-  }));
-}
-async function saveSitePhoto(slot){
-  if(!Object.prototype.hasOwnProperty.call(SITE_PHOTO_PATHS,slot) || sitePhotoBusy.has(slot)) return;
-  const statusId=slot+"Status";
-  clearStatus(statusId);
-  if(!accessToken || currentUserId!==ADMIN_UID)
-    return setStatus(statusId,"Silakan login sebagai admin terlebih dahulu.","err");
-  if(!sitePhotoLoaded.has(slot))
-    return setStatus(statusId,"Data foto belum berhasil dimuat. Buka kembali menu ini.","err");
-  const judul=$(slot+"Judul").value.trim();
-  const keterangan=$(slot+"Keterangan").value.trim();
-  const file=$(slot+"File").files[0];
-  if(!judul) return setStatus(statusId,"Judul foto wajib diisi.","err");
-  if(file && (!file.type.startsWith("image/") || file.size===0))
-    return setStatus(statusId,"Pilih file gambar yang valid.","err");
-  if(file && file.size>10*1024*1024)
-    return setStatus(statusId,"Ukuran foto maksimal 10 MB.","err");
-  const button=document.querySelector('.site-photo-save[data-slot="'+slot+'"]');
-  sitePhotoBusy.add(slot);
-  sitePhotoControls(slot,true);
-  button.textContent="Menyimpan...";
-  let uploaded=false;
-  try{
-    // Validasi token melalui sistem Supabase Auth yang sudah digunakan.
-    const token=accessToken;
-    const request=(path,options={})=>{
-      if(accessToken!==token || currentUserId!==ADMIN_UID) throw new Error("Sesi berubah. Silakan login kembali.");
-      return apiFetch(path,{...options,headers:{...options.headers,Authorization:"Bearer "+token}},false);
-    };
-    const auth=await request('/auth/v1/user');
-    if(!auth.ok) throw new Error("Sesi login tidak valid atau kedaluwarsa. Silakan login kembali.");
-    const user=await auth.json();
-    if(user.id!==ADMIN_UID) throw new Error("Akun ini tidak memiliki hak admin.");
-    const existing=await sitePhotoRow(slot,request);
-    const body={judul,keterangan};
-    if(file){
-      // Upsert tanpa menghapus foto lama terlebih dahulu.
-      const up=await request('/storage/v1/object/galery/'+SITE_PHOTO_PATHS[slot],{
-        method:"POST",headers:{"Content-Type":file.type,"x-upsert":"true","Cache-Control":"max-age=0"},body:file
-      });
-      if(!up.ok) throw new Error("Upload foto gagal: "+await up.text());
-      uploaded=true;
-      body.url_foto=sitePhotoUrl(slot)+"?v="+Date.now();
-      body.nama_file=SITE_PHOTO_PATHS[slot];
-    }
-    if(!existing){
-      body.name_foto=SITE_PHOTO_PATHS[slot];
-      body.nama_file=SITE_PHOTO_PATHS[slot];
-      body.url_foto=body.url_foto || sitePhotoUrl(slot);
-    }
-    const path='/rest/v1/galery'+(existing?'?id=eq.'+encodeURIComponent(existing.id):'');
-    const res=await request(path,{
-      method:existing?'PATCH':'POST',
-      headers:{'Content-Type':'application/json','Prefer':'return=representation'},
-      body:JSON.stringify(body)
-    });
-    if(!res.ok) throw new Error("Penyimpanan data gagal: "+await res.text());
-    const saved=await res.json();
-    if(!Array.isArray(saved) || saved.length!==1 || saved[0].id==null)
-      throw new Error("Supabase tidak mengonfirmasi satu baris tersimpan. Periksa izin data atau muat ulang.");
-    const check=await request('/rest/v1/galery?id=eq.'+encodeURIComponent(saved[0].id)+'&select=id,judul,keterangan,url_foto');
-    if(!check.ok) throw new Error("Data telah dikirim, tetapi pembacaan ulang gagal. Muat ulang untuk memeriksa.");
-    const verified=await check.json();
-    if(verified.length!==1 || verified[0].judul!==judul || verified[0].keterangan!==keterangan ||
-       (body.url_foto && verified[0].url_foto!==body.url_foto))
-      throw new Error("Hasil penyimpanan belum dapat dikonfirmasi. Muat ulang untuk memeriksa.");
-    $(slot+"File").value="";
-    if(sitePhotoLocalUrls[slot]){URL.revokeObjectURL(sitePhotoLocalUrls[slot]);delete sitePhotoLocalUrls[slot]}
-    sitePhotoDirty.delete(slot);
-    $(slot+"Judul").value=verified[0].judul;
-    $(slot+"Keterangan").value=verified[0].keterangan;
-    loadOneSitePhoto(slot,verified[0].url_foto);
-    const index=galleryData.findIndex(row=>row.id===saved[0].id);
-    if(index>=0) galleryData[index]={...galleryData[index],...saved[0]};
-    else galleryData.unshift(saved[0]);
-    setStatus(statusId,"Perubahan berhasil disimpan dan dibaca ulang dari Supabase.","ok");
-  }catch(err){
-    setStatus(statusId,(uploaded?"Foto sudah terunggah, tetapi penyimpanan judul/keterangan belum terkonfirmasi. ":"")+err.message,"err");
-  }finally{
-    sitePhotoBusy.delete(slot);
-    sitePhotoControls(slot,false);
-    button.textContent="Simpan Perubahan";
-  }
-}
-document.querySelectorAll(".site-photo-save").forEach(btn=>{
-  const slot=btn.dataset.slot;
-  btn.addEventListener("click",()=>saveSitePhoto(slot));
-  ["Judul","Keterangan"].forEach(suffix=>$(slot+suffix).addEventListener("input",()=>sitePhotoDirty.add(slot)));
-  $(slot+"File").addEventListener("change",()=>{
-    sitePhotoDirty.add(slot);
-    if(sitePhotoLocalUrls[slot]){URL.revokeObjectURL(sitePhotoLocalUrls[slot]);delete sitePhotoLocalUrls[slot]}
-    const file=$(slot+"File").files[0];
-    if(file && file.type.startsWith("image/")){
-      sitePhotoLocalUrls[slot]=URL.createObjectURL(file);
-      loadOneSitePhoto(slot,sitePhotoLocalUrls[slot]);
-    }else loadOneSitePhoto(slot);
-  });
-});
-
-function loadLogoPreview(){
-  const img=$("logoPreview"), fallback=$("logoFallback");
-  img.onload=()=>{img.style.display="block";fallback.style.display="none"};
-  img.onerror=()=>{img.style.display="none";fallback.style.display="inline-flex"};
-  img.src=BASE_URL+"/storage/v1/object/public/galery/"+LOGO_PATH+"?v="+Date.now();
-}
-
-$("saveLogoBtn").addEventListener("click",async()=>{
-  clearStatus("logoStatus");
-  const file=$("logoFile").files[0];
-  if(!file) return setStatus("logoStatus","Silakan pilih file logo.","err");
-  if(file.size>5*1024*1024) return setStatus("logoStatus","Ukuran logo maksimal 5 MB.","err");
-
-  $("saveLogoBtn").disabled=true; $("saveLogoBtn").textContent="Menyimpan...";
-  try{
-    await apiFetch("/storage/v1/object/galery/"+LOGO_PATH,{method:"DELETE"});
-    const up=await apiFetch("/storage/v1/object/galery/"+LOGO_PATH,{
-      method:"POST",
-      headers:{"Content-Type":file.type||"application/octet-stream","x-upsert":"true"},
-      body:file
-    });
-    if(!up.ok) throw new Error(await up.text());
-    $("logoFile").value=""; loadLogoPreview();
-    setStatus("logoStatus","Logo berhasil diperbarui.","ok");
-  }catch(err){setStatus("logoStatus","Logo gagal disimpan: "+err.message,"err")}
-  finally{$("saveLogoBtn").disabled=false;$("saveLogoBtn").textContent="Simpan / Perbarui Logo"}
-});
-
-if(accessToken && currentUserId===ADMIN_UID){
-  showAdmin();
-  loadGalleryData().then(()=>openPanel("add")).catch(()=>showLogin());
-}else showLogin();
+loadGalleryFromSupabase();
 </script>
 
-
 <script>
-// Fasilitas: judul bagian di website_content, foto di galery dan Storage yang sudah ada.
-const FACILITY_HEADER_TYPE='section_header';
-let dynamicFacilities=[],dynamicPhotoRows=[];
-let dynamicBusy=false,dynamicLoadSequence=0,dynamicEditingId=null;
-let facilityHeaderId=null,facilityHeaderLoaded=false,facilityHeaderBusy=false,facilityHeaderDirty=false;
-let dynamicPreviewUrl='';
-function dynamicLoggedIn(){return !!accessToken && currentUserId===ADMIN_UID}
-async function dynamicFetch(path,options={},auth=true){
-  const controller=new AbortController();
-  const timeout=setTimeout(()=>controller.abort(),20000);
-  try{
-    return await apiFetch(path,{...options,signal:controller.signal},auth);
-  }catch(err){
-    if(err.name==='AbortError') throw new Error('Koneksi terlalu lama. Muat ulang daftar untuk memeriksa hasil sebelum mencoba menyimpan lagi.');
-    throw err;
-  }finally{clearTimeout(timeout)}
-}
-
-function dynamicLock(locked){
-  dynamicBusy=locked;
-  document.querySelectorAll('#dynamicFacilityManager button:not(#addDynamicFacilityBtn):not(#openDynamicFacilityBtn):not(#refreshDynamicFacilityBtn), #dynamicFacilityForm input, #dynamicFacilityForm textarea').forEach(el=>el.disabled=locked);
-}
-function dynamicReset(){
-  dynamicEditingId=null;
-  $('dynamicJudul').value='';$('dynamicDeskripsi').value='';$('dynamicPhotoFile').value='';
-  if(dynamicPreviewUrl){URL.revokeObjectURL(dynamicPreviewUrl);dynamicPreviewUrl=''}
-  $('dynamicPhotoPreview').removeAttribute('src');$('dynamicPhotoPreview').style.display='none';
-  $('dynamicFormTitle').textContent='Tambah Fasilitas';
-  $('dynamicFacilityForm').classList.remove('hidden');
-}
-async function dynamicResponse(res){
-  const raw=await res.text();let data;
-  try{data=JSON.parse(raw)}catch(_){data=null}
-  if(!res.ok) throw new Error(data?.message || data?.error_description || raw || 'Permintaan gagal.');
-  if(!Array.isArray(data)) throw new Error('Respons fasilitas tidak valid.');
-  return data;
-}
-async function dynamicAuthorizedRequest(){
-  if(!dynamicLoggedIn()) throw new Error('Silakan login sebagai admin terlebih dahulu.');
-  const token=accessToken;
-  const request=(path,options={})=>{
-    if(!dynamicLoggedIn() || accessToken!==token) throw new Error('Sesi berubah. Silakan login kembali.');
-    return dynamicFetch(path,{...options,headers:{...options.headers,Authorization:'Bearer '+token}},false);
+// Baca fasilitas tanpa hak tulis; tetap tampilkan enam kartu asli bila koneksi gagal.
+(async function loadFacilitiesFromSupabase(){
+  const section=document.getElementById('laboratorium');
+  const grid=section.querySelector('.lab-grid');
+  const originalCards=[...grid.querySelectorAll('.lab-card')];
+  const read=async path=>{
+    const res=await fetch(SUPABASE_URL+path,{headers:{apikey:SUPABASE_KEY}});
+    if(!res.ok) throw new Error('Data fasilitas belum dapat dimuat.');
+    const rows=await res.json();if(!Array.isArray(rows)) throw new Error('Data fasilitas tidak valid.');
+    return rows;
   };
-  const res=await request('/auth/v1/user');
-  if(!res.ok) throw new Error('Sesi kedaluwarsa. Silakan logout lalu login kembali.');
-  const user=await res.json();
-  if(user.id!==ADMIN_UID) throw new Error('Akun ini tidak memiliki hak admin.');
-  return request;
-}
-function dynamicPhotoMarker(id){return 'website/fasilitas-dinamis/'+id}
-function dynamicPhoto(id){return dynamicPhotoRows.find(x=>x.name_foto===dynamicPhotoMarker(id))}
-function dynamicShowPhoto(url){
-  const img=$('dynamicPhotoPreview');img.style.display=url?'block':'none';
-  if(url) img.src=url;else img.removeAttribute('src');
-}
-function renderDynamicFacilities(){
-  const box=$('dynamicFacilityList');box.replaceChildren();
-  if(!dynamicFacilities.length){box.textContent='Belum ada fasilitas tambahan. Enam fasilitas utama tersedia pada kartu di atas.';return}
-  dynamicFacilities.forEach(item=>{
-    const card=document.createElement('div');card.className='item';
-    const photo=dynamicPhoto(item.id);
-    if(photo?.url_foto){const img=document.createElement('img');img.src=photo.url_foto;img.alt=item.judul || 'Foto fasilitas';card.append(img)}
-    const body=document.createElement('div');body.className='item-body';
-    const title=document.createElement('h3');title.textContent=item.judul || 'Tanpa judul';
+  const results=await Promise.allSettled([
+    read('/rest/v1/galery?select=id,name_foto,nama_file,judul,keterangan,url_foto&order=created_at.desc'),
+    read('/rest/v1/website_content?bagian=eq.fasilitas&select=id,tipe,judul,deskripsi&order=id.asc')
+  ]);
+  const photos=results[0].status==='fulfilled'?results[0].value:[];
+  const content=results[1].status==='fulfilled'?results[1].value:[];
+  function setImage(img,url,title){
+    if(!url) return;
+    try{if(!['http:','https:'].includes(new URL(url,location.href).protocol)) return}catch(_){return}
+    const previous=img.getAttribute('src');
+    img.onerror=()=>{img.onerror=null;if(previous && previous!==url) img.src=previous;else img.style.display='none'};
+    img.src=url;img.alt=title || 'Foto laboratorium';
+  }
+  originalCards.forEach((card,index)=>{
+    const marker='website/fasilitas-'+(index+1);
+    const url=SUPABASE_URL+'/storage/v1/object/public/galery/'+marker;
+    const photo=photos.find(row=>row.name_foto===marker || row.nama_file===marker || (row.url_foto||'').split(/[?#]/)[0]===url);
+    if(!photo) return;
+    if(photo.judul!=null) card.querySelector('h3').textContent=photo.judul;
+    if(photo.keterangan!=null) card.querySelector('p').textContent=photo.keterangan;
+    setImage(card.querySelector('img'),photo.url_foto,photo.judul);
+  });
+  const heading=content.find(row=>row.tipe==='section_header');
+  if(heading){
+    if(heading.judul!=null) section.querySelector('.section-title h2').textContent=heading.judul;
+    if(heading.deskripsi!=null) section.querySelector('.section-title p').textContent=heading.deskripsi;
+  }
+  content.filter(row=>row.tipe!=='section_header').forEach(item=>{
+    const card=document.createElement('div');card.className='lab-card';
+    const photo=photos.find(row=>row.name_foto==='website/fasilitas-dinamis/'+item.id);
+    if(photo?.url_foto){
+      const img=document.createElement('img');img.loading='lazy';setImage(img,photo.url_foto,item.judul);card.append(img);
+    }
+    const body=document.createElement('div');body.className='lab-content';
+    const title=document.createElement('h3');title.textContent=item.judul || 'Laboratorium';
     const desc=document.createElement('p');desc.textContent=item.deskripsi || '';desc.style.whiteSpace='pre-wrap';
-    const actions=document.createElement('div');actions.className='item-actions';
-    const edit=document.createElement('button');edit.type='button';edit.className='secondary';edit.textContent='Edit Nama / Foto / Keterangan';edit.disabled=dynamicBusy;
-    edit.addEventListener('click',()=>editDynamicFacility(item.id));
-    const del=document.createElement('button');del.type='button';del.className='danger';del.textContent='Hapus';del.disabled=dynamicBusy;
-    del.addEventListener('click',()=>deleteDynamicFacility(item.id));
-    actions.append(edit,del);body.append(title,desc,actions);card.append(body);box.append(card);
+    body.append(title,desc);card.append(body);grid.append(card);
   });
-}
-async function loadDynamicFacilities(){
-  const seq=++dynamicLoadSequence;
-  if(!dynamicLoggedIn()) return false;
-  const token=accessToken;
-  try{
-    const results=await Promise.all([
-      dynamicFetch('/rest/v1/website_content?bagian=eq.fasilitas&select=id,bagian,tipe,judul,deskripsi&order=id.asc').then(dynamicResponse),
-      dynamicFetch('/rest/v1/galery?name_foto=like.website%2Ffasilitas-dinamis%2F*&select=id,name_foto,url_foto&order=created_at.desc').then(dynamicResponse)
-    ]);
-    if(seq!==dynamicLoadSequence || !dynamicLoggedIn() || token!==accessToken) return false;
-    dynamicFacilities=results[0].filter(row=>row.tipe!==FACILITY_HEADER_TYPE);
-    dynamicPhotoRows=results[1];renderDynamicFacilities();return true;
-  }catch(err){
-    if(seq===dynamicLoadSequence && dynamicLoggedIn()) setStatus('dynamicStatus','Fasilitas gagal dimuat: '+err.message,'err');
-    return false;
+  if(results.some(result=>result.status==='rejected')){
+    const note=document.createElement('p');note.style.cssText='text-align:center;color:#667085;margin-top:20px;font-size:13px';
+    note.textContent='Sebagian pembaruan fasilitas belum dapat dimuat. Silakan muat ulang halaman.';
+    section.querySelector('.container').append(note);
   }
-}
-function editDynamicFacility(id){
-  if(dynamicBusy || !dynamicLoggedIn()) return;
-  const item=dynamicFacilities.find(x=>String(x.id)===String(id));
-  if(!item) return setStatus('dynamicStatus','Data tidak ditemukan. Klik Muat Ulang.','err');
-  dynamicReset();dynamicEditingId=item.id;
-  $('dynamicJudul').value=item.judul || '';$('dynamicDeskripsi').value=item.deskripsi || '';
-  dynamicShowPhoto(dynamicPhoto(id)?.url_foto);
-  $('dynamicFormTitle').textContent='Edit Fasilitas';
-  $('dynamicFacilityForm').classList.remove('hidden');clearStatus('dynamicStatus');$('dynamicJudul').focus();
-}
-async function saveDynamicFacility(event){
-  event.preventDefault();if(dynamicBusy) return;
-  clearStatus('dynamicStatus');
-  const judul=$('dynamicJudul').value.trim(),deskripsi=$('dynamicDeskripsi').value.trim();
-  const file=$('dynamicPhotoFile').files[0];
-  if(!judul) return setStatus('dynamicStatus','Nama laboratorium wajib diisi.','err');
-  if(dynamicEditingId===null && !file) return setStatus('dynamicStatus','Pilih foto untuk fasilitas baru.','err');
-  if(file && (!file.type.startsWith('image/') || !file.size || file.size>10*1024*1024))
-    return setStatus('dynamicStatus','Pilih gambar yang valid dengan ukuran maksimal 10 MB.','err');
-  dynamicLock(true);$('saveDynamicFacilityBtn').textContent='Menyimpan...';
-  let textSaved=false;
-  try{
-    const request=await dynamicAuthorizedRequest();
-    const editing=dynamicEditingId!==null;
-    const path='/rest/v1/website_content'+(editing?'?bagian=eq.fasilitas&or=(tipe.is.null,tipe.neq.section_header)&id=eq.'+encodeURIComponent(dynamicEditingId):'');
-    const body=editing?{judul,deskripsi}:{bagian:'fasilitas',tipe:'card',judul,deskripsi};
-    const saved=await dynamicResponse(await request(path,{
-      method:editing?'PATCH':'POST',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(body)
-    }));
-    if(saved.length!==1 || saved[0].id==null) throw new Error('Tidak ada satu baris yang dikonfirmasi tersimpan. Muat ulang untuk memeriksa.');
-    const id=saved[0].id;textSaved=true;dynamicEditingId=id;
-    // Pertahankan ID setelah POST agar percobaan ulang foto tidak menambah kartu ganda.
-    $('dynamicFormTitle').textContent='Edit Fasilitas';
-    const verified=await dynamicResponse(await request('/rest/v1/website_content?bagian=eq.fasilitas&id=eq.'+encodeURIComponent(id)+'&select=id,judul,deskripsi'));
-    if(verified.length!==1 || verified[0].judul!==judul || verified[0].deskripsi!==deskripsi)
-      throw new Error('Hasil baca ulang teks berbeda. Muat ulang untuk memeriksa.');
-    if(file){
-      const marker=dynamicPhotoMarker(id);
-      const matches=await dynamicResponse(await request('/rest/v1/galery?name_foto=eq.'+encodeURIComponent(marker)+'&select=id'));
-      if(matches.length>1) throw new Error('Ada data foto ganda untuk fasilitas ini. Data perlu diperiksa.');
-      const objectPath=marker+'/'+crypto.randomUUID();
-      const uploaded=await request('/storage/v1/object/galery/'+objectPath,{
-        method:'POST',headers:{'Content-Type':file.type,'x-upsert':'false'},body:file
-      });
-      if(!uploaded.ok) throw new Error('Foto gagal diunggah: '+await uploaded.text());
-      const url_foto=BASE_URL+'/storage/v1/object/public/galery/'+objectPath;
-      const photoBody={judul,keterangan:deskripsi,name_foto:marker,nama_file:objectPath,url_foto};
-      const photoSaved=await dynamicResponse(await request('/rest/v1/galery'+(matches.length?'?id=eq.'+encodeURIComponent(matches[0].id):''),{
-        method:matches.length?'PATCH':'POST',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(photoBody)
-      }));
-      if(photoSaved.length!==1) throw new Error('Penyimpanan alamat foto belum terkonfirmasi.');
-      const photoCheck=await dynamicResponse(await request('/rest/v1/galery?name_foto=eq.'+encodeURIComponent(marker)+'&select=id,url_foto'));
-      if(photoCheck.length!==1 || photoCheck[0].url_foto!==url_foto) throw new Error('Alamat foto belum dapat dibaca ulang.');
-    }
-    dynamicReset();
-    if(await loadDynamicFacilities()) setStatus('dynamicStatus','Nama, keterangan, dan foto fasilitas berhasil disimpan. Muat ulang website utama untuk melihatnya.','ok');
-  }catch(err){setStatus('dynamicStatus',(textSaved?'Teks sudah tersimpan; proses belum selesai. ':'Penyimpanan belum terkonfirmasi: ')+err.message,'err')}
-  finally{dynamicLock(false);$('saveDynamicFacilityBtn').textContent='Simpan Fasilitas'}
-}
-async function deleteDynamicFacility(id){
-  if(dynamicBusy || !dynamicLoggedIn()) return;
-  const item=dynamicFacilities.find(x=>String(x.id)===String(id));
-  if(!item || !confirm('Hapus fasilitas "'+(item.judul || 'Tanpa judul')+'" dari website?')) return;
-  clearStatus('dynamicStatus');dynamicLock(true);
-  try{
-    const request=await dynamicAuthorizedRequest();
-    const path='/rest/v1/website_content?bagian=eq.fasilitas&or=(tipe.is.null,tipe.neq.section_header)&id=eq.'+encodeURIComponent(id);
-    const deleted=await dynamicResponse(await request(path,{method:'DELETE',headers:{'Prefer':'return=representation'}}));
-    if(deleted.length!==1) throw new Error('Tidak ada satu baris yang dikonfirmasi terhapus.');
-    if((await dynamicResponse(await request(path+'&select=id'))).length) throw new Error('Data masih ditemukan setelah penghapusan.');
-    // Arsip foto tetap disimpan; tidak menghapus file yang mungkin masih dipakai di galeri.
-    if(String(dynamicEditingId)===String(id)) dynamicReset();
-    if(await loadDynamicFacilities()) setStatus('dynamicStatus','Fasilitas berhasil dihapus dari bagian Fasilitas Kami.','ok');
-  }catch(err){setStatus('dynamicStatus','Penghapusan belum terkonfirmasi: '+err.message,'err')}
-  finally{dynamicLock(false)}
-}
-function headerLock(locked){
-  ['facilitySectionJudul','facilitySectionDeskripsi','saveFacilityHeaderBtn'].forEach(id=>$(id).disabled=locked);
-}
-async function loadFacilityHeader(){
-  if(!dynamicLoggedIn() || facilityHeaderBusy || facilityHeaderDirty) return;
-  const token=accessToken;headerLock(true);facilityHeaderLoaded=false;clearStatus('facilityHeaderStatus');
-  try{
-    const rows=await dynamicResponse(await dynamicFetch('/rest/v1/website_content?bagian=eq.fasilitas&tipe=eq.section_header&select=id,judul,deskripsi'));
-    if(token!==accessToken || !dynamicLoggedIn()) return;
-    if(rows.length>1) throw new Error('Ada lebih dari satu judul bagian. Data perlu diperiksa.');
-    facilityHeaderId=rows[0]?.id ?? null;
-    $('facilitySectionJudul').value=rows[0]?.judul ?? 'Jelajahi Laboratorium';
-    $('facilitySectionDeskripsi').value=rows[0]?.deskripsi ?? 'Mengenal ruang laboratorium dan fasilitas pembelajaran yang tersedia di Universitas Dr. Soekardjo Banyuwangi.';
-    facilityHeaderLoaded=true;
-  }catch(err){setStatus('facilityHeaderStatus','Judul bagian gagal dimuat: '+err.message,'err')}
-  finally{headerLock(!facilityHeaderLoaded)}
-}
-async function saveFacilityHeader(event){
-  event.preventDefault();if(facilityHeaderBusy || !facilityHeaderLoaded) return;
-  const judul=$('facilitySectionJudul').value.trim(),deskripsi=$('facilitySectionDeskripsi').value.trim();
-  if(!judul) return setStatus('facilityHeaderStatus','Judul besar wajib diisi.','err');
-  facilityHeaderBusy=true;headerLock(true);clearStatus('facilityHeaderStatus');
-  try{
-    const request=await dynamicAuthorizedRequest();
-    const rows=await dynamicResponse(await request('/rest/v1/website_content?bagian=eq.fasilitas&tipe=eq.section_header&select=id'));
-    if(rows.length>1) throw new Error('Ada lebih dari satu judul bagian.');
-    const saved=await dynamicResponse(await request('/rest/v1/website_content'+(rows.length?'?bagian=eq.fasilitas&tipe=eq.section_header&id=eq.'+encodeURIComponent(rows[0].id):''),{
-      method:rows.length?'PATCH':'POST',headers:{'Content-Type':'application/json','Prefer':'return=representation'},
-      body:JSON.stringify(rows.length?{judul,deskripsi}:{bagian:'fasilitas',tipe:FACILITY_HEADER_TYPE,judul,deskripsi})
-    }));
-    if(saved.length!==1 || saved[0].id==null) throw new Error('Penyimpanan judul belum terkonfirmasi.');
-    facilityHeaderId=saved[0].id;
-    const check=await dynamicResponse(await request('/rest/v1/website_content?id=eq.'+encodeURIComponent(facilityHeaderId)+'&select=judul,deskripsi'));
-    if(check.length!==1 || check[0].judul!==judul || check[0].deskripsi!==deskripsi) throw new Error('Hasil baca ulang berbeda.');
-    facilityHeaderDirty=false;setStatus('facilityHeaderStatus','Judul besar dan teks pengantar berhasil disimpan.','ok');
-  }catch(err){setStatus('facilityHeaderStatus','Penyimpanan belum terkonfirmasi: '+err.message,'err')}
-  finally{facilityHeaderBusy=false;headerLock(false)}
-}
-function openDynamicFacilityForm(startNew=false){
-  if(!dynamicLoggedIn()){
-    setStatus('dynamicStatus','Sesi admin tidak dikenali. Silakan logout lalu login kembali.','err');
-    $('dynamicStatus').scrollIntoView({behavior:'smooth',block:'center'});
-    return;
+  // Pintasan hanya muncul untuk sesi admin yang diverifikasi oleh Supabase.
+  const token=sessionStorage.getItem('lab_access_token');
+  if(token){
+    try{
+      const res=await fetch(SUPABASE_URL+'/auth/v1/user',{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+token}});
+      if(res.ok && (await res.json()).id==='5a12f804-2471-47d5-8605-ae8cd7c99b10'){
+        const box=document.createElement('div');box.style.cssText='text-align:center;margin-top:28px';
+        const link=document.createElement('a');link.href='admin.html#tambah-fasilitas';link.className='btn';
+        link.textContent='+ Tambahkan Fasilitas Baru';box.append(link);section.querySelector('.container').append(box);
+      }
+    }catch(_){/* Tidak menampilkan kontrol admin bila sesi tidak dapat diverifikasi. */}
   }
-  if(dynamicBusy){
-    setStatus('dynamicStatus','Penyimpanan masih berjalan. Tunggu hasilnya sebelum membuka fasilitas lain.','');
-    $('dynamicStatus').scrollIntoView({behavior:'smooth',block:'center'});
-    return;
-  }
-  if(startNew && dynamicEditingId!==null) dynamicReset();
-  $('dynamicFacilityForm').classList.remove('hidden');
-  setStatus('dynamicStatus','Formulir siap. Isi nama laboratorium, keterangan, dan foto, lalu klik Simpan Fasilitas.','ok');
-  $('dynamicFacilityForm').scrollIntoView({behavior:'smooth',block:'center'});
-  $('dynamicJudul').focus({preventScroll:true});
-}
-$('addDynamicFacilityBtn').addEventListener('click',()=>openDynamicFacilityForm(true));
-$('openDynamicFacilityBtn').addEventListener('click',()=>openDynamicFacilityForm(false));
-$('cancelDynamicFacilityBtn').addEventListener('click',dynamicReset);
-$('dynamicFacilityForm').addEventListener('submit',saveDynamicFacility);
-$('refreshDynamicFacilityBtn').addEventListener('click',async()=>{
-  if(!dynamicLoggedIn() || dynamicBusy){openDynamicFacilityForm(false);return}
-  setStatus('dynamicStatus','Memuat fasilitas...','');
-  if(await loadDynamicFacilities()) setStatus('dynamicStatus','Daftar fasilitas sudah diperbarui.','ok');
-});
-$('dynamicPhotoFile').addEventListener('change',()=>{
-  if(dynamicPreviewUrl){URL.revokeObjectURL(dynamicPreviewUrl);dynamicPreviewUrl=''}
-  const file=$('dynamicPhotoFile').files[0];
-  if(file?.type.startsWith('image/')){dynamicPreviewUrl=URL.createObjectURL(file);dynamicShowPhoto(dynamicPreviewUrl)}
-  else dynamicShowPhoto(dynamicPhoto(dynamicEditingId)?.url_foto);
-});
-$('facilityHeaderForm').addEventListener('submit',saveFacilityHeader);
-['facilitySectionJudul','facilitySectionDeskripsi'].forEach(id=>$(id).addEventListener('input',()=>facilityHeaderDirty=true));
-$('menuSitePhotos').addEventListener('click',()=>{loadFacilityHeader();if(!dynamicBusy) loadDynamicFacilities()});
-// Gunakan tampilan sesi yang sudah ada; tidak mengganti kode login.
-new MutationObserver(()=>{
-  if($('adminBox').classList.contains('hidden')){
-    ++dynamicLoadSequence;dynamicFacilities=[];dynamicPhotoRows=[];dynamicReset();$('dynamicFacilityList').replaceChildren();
-    facilityHeaderLoaded=false;facilityHeaderDirty=false;clearStatus('dynamicStatus');
-  }else{loadFacilityHeader();loadDynamicFacilities()}
-}).observe($('adminBox'),{attributes:true,attributeFilter:['class']});
-if(dynamicLoggedIn()){loadFacilityHeader();loadDynamicFacilities()}
+})();
 
-let facilityDeepLinkPending=location.hash==='#tambah-fasilitas';
-function openFacilityDeepLink(){
-  if(!facilityDeepLinkPending || !dynamicLoggedIn() || $('adminBox').classList.contains('hidden') || !$('menuAdd').classList.contains('active')) return;
-  facilityDeepLinkPending=false;openPanel('sitePhotos');loadFacilityHeader();loadDynamicFacilities();
-  $('dynamicFacilityForm').classList.remove('hidden');$('dynamicJudul').focus();
-  $('dynamicFacilityManager').scrollIntoView({behavior:'smooth',block:'start'});
-}
-new MutationObserver(openFacilityDeepLink).observe($('addPanel'),{attributes:true,attributeFilter:['class']});
-// Runs after the existing gallery load/openPanel promise chain when the page starts logged in.
-new MutationObserver(openFacilityDeepLink).observe($('menuAdd'),{attributes:true,attributeFilter:['class']});
-setTimeout(openFacilityDeepLink,0);
 </script>
-
 </body>
 </html>
